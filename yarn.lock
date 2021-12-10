@@ -2921,13 +2921,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graasp-plugin-file-item@github:graasp/graasp-plugin-file-item#18/newFilePlugin":
+"graasp-plugin-file-item@github:graasp/graasp-plugin-file-item":
   version: 0.1.0
-  resolution: "graasp-plugin-file-item@https://github.com/graasp/graasp-plugin-file-item.git#commit=d97e8b3524293436e532e5b2aba8544aaaa7c4d2"
+  resolution: "graasp-plugin-file-item@https://github.com/graasp/graasp-plugin-file-item.git#commit=d5fbd6d4408215e46db085030361ad42eefe73b1"
   dependencies:
     graasp-file-upload-limiter: "github:graasp/graasp-file-upload-limiter"
-    graasp-plugin-file: "github:graasp/graasp-plugin-file#3/fixS3"
-  checksum: 7de58a037bbc5068b3de176990cdb6080ecd956025cde4461dd91dbe48de17e6c79c5efae2c6229c576db46d144eaedad12a541386b912fef8a59482599f4bfe
+    graasp-plugin-file: "github:graasp/graasp-plugin-file"
+  checksum: ec0bb8692a52043b93586df65edc9970104c7e8d79eb4923c719c3ab388ff3266f93612b32c642adfbec79f06ae2cdd7ddc5fa37d835bdcb8af3ad67c7e853d5
   languageName: node
   linkType: hard
 
@@ -2943,21 +2943,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graasp-plugin-file@github:graasp/graasp-plugin-file#3/fixS3":
-  version: 0.1.0
-  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=94de2f0e51efdc4413dbc7748c390919872e37a7"
-  dependencies:
-    aws-sdk: ^2.793.0
-    content-disposition: 0.5.3
-    fastify-multipart: 5.1.0
-    http-status-codes: 2.1.4
-  checksum: 3fc556d73e440f7138002f310cbd542cda579b0008408d4656a070c21fb0eae0ea91a0290eed3bb73155a09adf481f6e9ff46e2d3bf47f0ed375f74f223c2c80
-  languageName: node
-  linkType: hard
-
-"graasp-plugin-public@workspace:.":
+"graasp-plugin-import-zip@workspace:.":
   version: 0.0.0-use.local
-  resolution: "graasp-plugin-public@workspace:."
+  resolution: "graasp-plugin-import-zip@workspace:."
   dependencies:
     "@types/eslint": ^7.2.5
     "@types/graasp": "github:graasp/graasp-types"
@@ -2972,7 +2960,7 @@ __metadata:
     fastify-cors: ^6.0.2
     fastify-multipart: 5.1.0
     graasp-plugin-file: "github:graasp/graasp-plugin-file"
-    graasp-plugin-file-item: "github:graasp/graasp-plugin-file-item#18/newFilePlugin"
+    graasp-plugin-file-item: "github:graasp/graasp-plugin-file-item"
     graasp-test: "github:graasp/graasp-test"
     http-status-codes: ^2.1.4
     jest: ^27.2.5
