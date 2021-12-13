@@ -131,7 +131,7 @@ export const handleItemDescription = async (options: {
   }
   // files description
   else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
-    const item = items.find(({ name: thisName }) => name === thisName);
+    const item = items.find(({ name: thisName }) => name === thisName.split('.')[0]);
     item.description = content;
   } else {
     console.error(`${filepath} is not handled`);
