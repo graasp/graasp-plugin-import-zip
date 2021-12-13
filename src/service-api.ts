@@ -160,29 +160,24 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       // save graasp zip
       await pipeline(Readable.from(await zipFile.toBuffer()), fs.createWriteStream(zipPath));
 
-      try {
-        await extract(zipPath, { dir: contentFolder });
+      await extract(zipPath, { dir: contentFolder });
 
-        // check zip has graasp structure <- might delete this to accept any zip
-        await checkHasZipStructure(contentFolder);
+      // check zip has graasp structure <- might delete this to accept any zip
+      await checkHasZipStructure(contentFolder);
 
-        const items = await createItemsFromFolderContent({
-          member,
-          updateParentDescription,
-          uploadFile,
-          folderPath: contentFolder,
-          parentId,
-          log,
-        });
+      const items = await createItemsFromFolderContent({
+        member,
+        updateParentDescription,
+        uploadFile,
+        folderPath: contentFolder,
+        parentId,
+        log,
+      });
 
-        // delete zip and content
-        fs.rmSync(targetFolder, { recursive: true });
+      // delete zip and content
+      fs.rmSync(targetFolder, { recursive: true });
 
-        return items;
-      } catch (err) {
-        log.error('err: ', err);
-        // handle any errors
-      }
+      return items;
     },
   );
 };
