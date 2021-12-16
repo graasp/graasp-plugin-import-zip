@@ -31,3 +31,17 @@ export class FileIsNotAValidArchiveError extends GraaspImportZipError {
     );
   }
 }
+
+
+export class InvalidArchiveStructureError extends GraaspImportZipError {
+  constructor(data?: unknown) {
+    super(
+      {
+        code: 'GPIZERR002',
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: 'Zip structure is invalid',
+      },
+      data,
+    );
+  }
+}

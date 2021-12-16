@@ -7,6 +7,7 @@ import mime from 'mime-types';
 import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 import type { UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
+import { InvalidArchiveStructureError } from './errors';
 
 export const generateItemFromFilename = async (options: {
   filename: string;
@@ -142,7 +143,7 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
   // content has only one root
   const children = fs.readdirSync(contentPath);
   if (children.length !== 1) {
-    throw new Error('Zip structure is invalid');
+    throw new InvalidArchiveStructureError();
   }
 
   return true;
