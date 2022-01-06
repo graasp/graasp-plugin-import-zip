@@ -12,9 +12,7 @@ import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixture
 const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();
 
-
 describe('Import Zip', () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
 

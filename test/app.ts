@@ -1,4 +1,4 @@
-import fastify from 'fastify';
+import fastify, { FastifyInstance } from 'fastify';
 import plugin from '../src/service-api';
 import { TaskRunner, ItemTaskManager } from 'graasp-test';
 import schemas from '../src/schemas/common';
@@ -27,7 +27,7 @@ const DEFAULT_OPTIONS = {
   },
 };
 
-const build = async ({ taskManager, runner }: props) => {
+const build = async ({ taskManager, runner }: props): Promise<FastifyInstance> => {
   const app = fastify();
   app.addSchema(schemas);
   app.decorate('taskRunner', runner);

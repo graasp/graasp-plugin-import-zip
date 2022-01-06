@@ -32,7 +32,6 @@ export class FileIsNotAValidArchiveError extends GraaspImportZipError {
   }
 }
 
-
 export class InvalidArchiveStructureError extends GraaspImportZipError {
   constructor(data?: unknown) {
     super(
