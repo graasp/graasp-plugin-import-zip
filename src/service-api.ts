@@ -13,7 +13,11 @@ import { Item } from 'graasp';
 import { DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from './constants';
 import { zipImport } from './schemas/schema';
 import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
-import { checkHasZipStructure, generateItemFromFilename, handleItemDescription } from './utils/utils';
+import {
+  checkHasZipStructure,
+  generateItemFromFilename,
+  handleItemDescription,
+} from './utils/utils';
 import {
   GraaspImportZipPluginOptions,
   UpdateParentDescriptionFunction,
@@ -54,14 +58,13 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
     uploadFile,
     updateParentDescription,
     member,
-  }) => {
+  }): Promise<Item[]> => {
     const filenames = fs.readdirSync(folderPath);
     const folderName = path.basename(folderPath);
 
     const items = [];
 
     for (const filename of filenames) {
-
       const filepath = path.join(folderPath, filename);
 
       // update items' descriptions
