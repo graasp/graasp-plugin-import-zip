@@ -1,12 +1,12 @@
 import { FastifyLoggerInstance } from 'fastify';
-import { Item, Member } from 'graasp';
+import { Item } from 'graasp';
 import fs from 'fs';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import mime from 'mime-types';
 import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
-import type { UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
+import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
 
 export const generateItemFromFilename = async (options: {
@@ -149,8 +149,58 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
   return true;
 };
 
+// build the file content in case of Link/App
+export const buildTextContent = (url: string, type: ItemType): string => {
+  if (type === ItemType.LINK) {
+    return `[InternetShortcut]\n${url}\n`;
+  }
+  return `[InternetShortcut]\n${url}\nAppURL=1\n`;
+};
+
+export const addItemToZip = async (item: Item, dirPath, archive, member, fileServiceType, iTM, runner) => {
+  // get item and its related data
+  const itemExtra = item.extra as Extra;
+
+  switch (item.type) {
+    case fileServiceType:
+      // TODO: add uploaded files into zip
+      break;
+    case ItemType.DOCUMENT:
+      archive.append(itemExtra.document?.content, {
+        name: path.join(dirPath, `${item.name}.graasp`),
+      });
+      break;
+    case ItemType.LINK:
+      archive.append(buildTextContent(itemExtra.embeddedLink?.url, ItemType.LINK), {
+        name: path.join(dirPath, `${item.name}.url`),
+      });
+      break;
+    case ItemType.APP:
+      archive.append(buildTextContent(itemExtra.app?.url, ItemType.APP), {
+        name: path.join(dirPath, `${item.name}.url`),
+      });
+      break;
+    case ItemType.FOLDER:
+      // append description
+      dirPath = path.join(dirPath, item.name);
+      if (item.description) {
+        archive.append(item.description, {
+          name: path.join(dirPath, `${item.name}.description.html`),
+        });
+      }
+      // eslint-disable-next-line no-case-declarations
+      const subItems = await runner.runSingleSequence(
+        iTM.createGetChildrenTaskSequence(member, item.id, true)
+      );
+      console.log(subItems);
+      (subItems as Item[]).forEach((subItem) => {
+        addItemToZip(subItem, dirPath, archive, member, fileServiceType, iTM, runner);
+      });
+  }
+};
+
+// TODO: download file from S3
 // const extraFile = item.extra?.s3File as ExtraFile;
-// console.log('adding file to zip', extraFile.name);
 // const filePath = `${extraFile.path}/${extraFile.name}`;
 // const downloadTask = fTM.createDownloadFileTask(member, {
 //   reply,

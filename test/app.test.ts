@@ -4,7 +4,13 @@ import { v4 } from 'uuid';
 import { ItemTaskManager, TaskRunner } from 'graasp-test';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
-import { FIXTURE_IMAGE_PATH, FIXTURE_LIGHT_COLOR_ZIP_PATH, TMP_FOLDER_PATH } from './constants';
+import {
+  FIXTURE_IMAGE_PATH,
+  FIXTURE_LIGHT_COLOR_ZIP_PATH,
+  ITEM_FOLDER,
+  SUB_ITEMS,
+  TMP_FOLDER_PATH,
+} from './constants';
 import build from './app';
 import MockTask from 'graasp-test/src/tasks/task';
 import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixtures/lightColor';
@@ -137,5 +143,48 @@ describe('Import Zip', () => {
 
       expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
+  });
+});
+
+describe('Export Zip', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => task.result);
+    jest.spyOn(runner, 'runSingleSequence').mockImplementation(async (tasks) => tasks[0].result);
+  });
+
+  it('Successfully export zip', async () => {
+    const app = await build({
+      taskManager,
+      runner,
+    });
+
+    jest.spyOn(taskManager, 'createGetTask').mockImplementation((member, itemId) => {
+      if (ITEM_FOLDER.id === itemId) return new MockTask(ITEM_FOLDER);
+      SUB_ITEMS.forEach((item) => {
+        if (item.id === itemId) return new MockTask(item);
+      });
+      return new MockTask(null);
+    });
+    const createGetChildrenTask = jest
+      .spyOn(taskManager, 'createGetChildrenTaskSequence')
+      .mockImplementation((member, itemId) => {
+        if (ITEM_FOLDER.id === itemId) return [new MockTask(SUB_ITEMS)];
+        else return [new MockTask([])];
+      });
+
+    const res = await app.inject({
+      method: 'GET',
+      url: `/zip-export/${ITEM_FOLDER.id}`,
+      headers: new FormData().getHeaders(),
+    });
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(res.headers['content-type']).toBe('application/octet-stream');
+    expect(res.headers['content-disposition']).toBe(`filename=\"${ITEM_FOLDER.name}.zip\"`);
+
+    // recursively handle zip content
+    expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.length);
   });
 });

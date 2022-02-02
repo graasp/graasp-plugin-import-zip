@@ -28,4 +28,8 @@ export type Extra = {
     icons: string[];
     thumbnails;
   };
+  app?: {
+    url: string;
+    settings;
+  };
 };

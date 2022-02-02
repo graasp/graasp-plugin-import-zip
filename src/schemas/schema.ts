@@ -7,3 +7,13 @@ export const zipImport = {
     additionalProperties: false,
   },
 };
+
+export const zipExport = {
+  params: {
+    itemId: {
+      $ref: 'http://graasp.org/#/definitions/uuid',
+    },
+  },
+  required: ['itemId'],
+  additionalProperties: false,
+};
