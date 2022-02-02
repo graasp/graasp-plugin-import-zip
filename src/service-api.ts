@@ -19,11 +19,13 @@ import {
   handleItemDescription,
 } from './utils/utils';
 import {
+  Extra,
   GraaspImportZipPluginOptions,
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from './types';
 import { FileIsNotAValidArchiveError } from './utils/errors';
+import archiver from 'archiver';
 
 const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
 
@@ -181,6 +183,87 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       fs.rmSync(targetFolder, { recursive: true });
 
       return items;
+    },
+  );
+
+  // download item as zip
+  fastify.get<{ Params: { itemId: string } }>(
+    '/zip-export/:itemId',
+    //{ schema: zipExport },
+    async ({ member, params: { itemId }, log }) => {
+      const addFileToZip = async (item: Item, dirPath) => {
+        // get item and its related data
+        const itemExtra = item.extra as Extra;
+
+        console.log(item);
+        console.log(dirPath);
+
+        switch (item.type) {
+          case SERVICE_ITEM_TYPE:
+            // TODO: add uploaded files into zip
+            break;
+          case ItemType.DOCUMENT:
+            archive.append(itemExtra.document?.content, { name: `${dirPath}${item.name}.graasp` });
+            break;
+          case ItemType.LINK:
+            archive.append(itemExtra.embeddedLink?.url, { name: `${dirPath}${item.name}.url` });
+            break;
+          case ItemType.FOLDER:
+            // append description
+            if (dirPath === '') {
+              dirPath = `/${item.name}/`;
+            } else {
+              dirPath = `${dirPath}${item.name}/`;
+            }
+            if (item.description) {
+              archive.append(item.description, { name: `${dirPath}${item.name}.description.html` });
+            }
+            console.log(item.id);
+            // eslint-disable-next-line no-case-declarations
+            const tasks = iTM.createGetChildrenTaskSequence(member, item.id, true);
+            // eslint-disable-next-line no-case-declarations
+            const subItems = await runner.runSingleSequence(tasks, log);
+            console.log(subItems);
+            (subItems as Item[]).forEach((subItem) => {
+              addFileToZip(subItem, dirPath);
+            });
+        }
+      };
+      const getItemTask = iTM.createGetTask(member, itemId);
+      const item = await runner.runSingle(getItemTask);
+      console.log(item);
+      const folderName = item.name;
+      const folderPath = `${__dirname}/${folderName}.zip`;
+
+      const archive = archiver.create('zip', { store: true });
+      const output = fs.createWriteStream(`${folderName}.zip`);
+
+      // initialize archiver
+      output.on('close', function () {
+        console.log(archive.pointer() + ' total bytes');
+        console.log('archiver has been finalized and the output file descriptor has closed.');
+      });
+      output.on('end', function () {
+        console.log('Data has been drained');
+      });
+      archive.on('warning', function (err) {
+        if (err.code === 'ENOENT') {
+          console.log(err);
+        } else {
+          throw err;
+        }
+      });
+      archive.on('error', function (err) {
+        throw err;
+      });
+      // pipe archive data to the file
+      archive.pipe(output);
+
+      const rootPath = '';
+      await addFileToZip(item, rootPath);
+
+      archive.finalize();
+      return folderPath;
     },
   );
 };

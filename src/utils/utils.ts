@@ -1,5 +1,5 @@
 import { FastifyLoggerInstance } from 'fastify';
-import { Item } from 'graasp';
+import { Item, Member } from 'graasp';
 import fs from 'fs';
 import path from 'path';
 import { readFile } from 'fs/promises';
@@ -148,3 +148,16 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
 
   return true;
 };
+
+// const extraFile = item.extra?.s3File as ExtraFile;
+// console.log('adding file to zip', extraFile.name);
+// const filePath = `${extraFile.path}/${extraFile.name}`;
+// const downloadTask = fTM.createDownloadFileTask(member, {
+//   reply,
+//   itemId: item.id,
+//   filepath: extraFile.path,
+//   mimetype: extraFile.mimetype,
+// });
+// const file = await runner.runSingle(downloadTask);
+// console.log('received file', file);
+// archive.append(fs.createReadStream(file as PathLike), { name: `${extraFile.name}` });
