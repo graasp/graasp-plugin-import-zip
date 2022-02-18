@@ -5,7 +5,7 @@ import util from 'util';
 import mmm from 'mmmagic';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
+import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 import type { UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
@@ -102,6 +102,7 @@ export const generateItemFromFilename = async (options: {
           mimetype,
         },
       },
+      settings: buildSettings(mimetype.startsWith('image')),
     };
   }
 };

@@ -13,7 +13,7 @@ import {
   IMAGE_NAME_WITHOUT_EXTENSION,
 } from '../../test/fixtures/utils/fixtureUtils';
 import { generateItemFromFilename, handleItemDescription } from './utils';
-import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
+import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { Item } from 'graasp';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
@@ -72,6 +72,7 @@ describe('Utils', () => {
             mimetype: 'image/png',
           },
         },
+        settings: buildSettings(true),
       });
       expect(uploadFileMock).toHaveBeenCalledTimes(1);
     });
@@ -103,6 +104,7 @@ describe('Utils', () => {
             mimetype: 'image/png',
           },
         },
+        settings: buildSettings(true),
       });
       expect(uploadFileMock).toHaveBeenCalledTimes(1);
     });
