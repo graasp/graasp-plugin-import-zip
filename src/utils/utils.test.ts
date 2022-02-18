@@ -10,6 +10,7 @@ import {
   IMAGE_NAME,
   LINK_NAME,
   DOCUMENT_NAME,
+  IMAGE_NAME_WITHOUT_EXTENSION,
 } from '../../test/fixtures/utils/fixtureUtils';
 import { generateItemFromFilename, handleItemDescription } from './utils';
 import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
@@ -59,6 +60,37 @@ describe('Utils', () => {
       });
 
       const { size } = fs.lstatSync(path.resolve(__dirname, '../../test', FOLDER_PATH, 'img.png'));
+
+      expect(item).toEqual({
+        name: imageFilename,
+        type: DEFAULT_FILE_SERVICE_TYPE,
+        extra: {
+          [DEFAULT_FILE_SERVICE_TYPE]: {
+            name: imageFilename,
+            path: uploadPath,
+            size,
+            mimetype: 'image/png',
+          },
+        },
+      });
+      expect(uploadFileMock).toHaveBeenCalledTimes(1);
+    });
+    it('Image without extension', async () => {
+      const imageFilename = `${IMAGE_NAME_WITHOUT_EXTENSION}`;
+      const uploadPath = 'uploadFilePath';
+      const uploadFileMock = jest.fn().mockReturnValue(uploadPath);
+
+      const item = await generateItemFromFilename({
+        filename: imageFilename,
+        folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
+        log: DEFAULT_LOGGER,
+        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        uploadFile: uploadFileMock,
+      });
+
+      const { size } = fs.lstatSync(
+        path.resolve(__dirname, '../../test', FOLDER_PATH, 'img_no_extension'),
+      );
 
       expect(item).toEqual({
         name: imageFilename,
