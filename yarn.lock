@@ -3620,7 +3620,7 @@ __metadata:
     http-status-codes: ^2.2.0
     husky: 7.0.4
     jest: ^27.4.7
-    mime-types: 2.1.34
+    mmmagic: 0.5.3
     prettier: ^2.5.1
     qs: ^6.10.2
     slonik: ^27.1.0
@@ -5026,7 +5026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-types@npm:2.1.34, mime-types@npm:^2.1.12":
+"mime-types@npm:^2.1.12":
   version: 2.1.34
   resolution: "mime-types@npm:2.1.34"
   dependencies:
@@ -5155,6 +5155,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mmmagic@npm:0.5.3":
+  version: 0.5.3
+  resolution: "mmmagic@npm:0.5.3"
+  dependencies:
+    nan: ^2.13.2
+    node-gyp: latest
+  checksum: fa804bc3c49797c7c2d0616ecabd5e9234a934f2fe66c2d50d66d2e6ef455fdc83742770cd998a47cf01fcf00ad310af303d850a3d5ac5654ef810c0df01865d
+  languageName: node
+  linkType: hard
+
 "ms@npm:2.1.2":
   version: 2.1.2
   resolution: "ms@npm:2.1.2"
@@ -5173,6 +5183,15 @@ __metadata:
   version: 0.0.2
   resolution: "multi-fork@npm:0.0.2"
   checksum: bb12ec1c21dd50241e0f565579541222de96e4890140a77794567b266c348f34728ef370053c05a7afd3023357e31e2be7636fdbad31f6aae0fc6f255b81ee81
+  languageName: node
+  linkType: hard
+
+"nan@npm:^2.13.2":
+  version: 2.15.0
+  resolution: "nan@npm:2.15.0"
+  dependencies:
+    node-gyp: latest
+  checksum: 33e1bb4dfca447fe37d4bb5889be55de154828632c8d38646db67293a21afd61ed9909cdf1b886214a64707d935926c4e60e2b09de9edfc2ad58de31d6ce8f39
   languageName: node
   linkType: hard
 

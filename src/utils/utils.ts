@@ -1,13 +1,17 @@
 import { FastifyLoggerInstance } from 'fastify';
 import { Item } from 'graasp';
 import fs from 'fs';
+import util from 'util';
+import mmm from 'mmmagic';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import mime from 'mime-types';
-import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
+import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 import type { UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
+
+const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
+const asyncDetectFile = util.promisify(magic.detectFile.bind(magic));
 
 export const generateItemFromFilename = async (options: {
   filename: string;
@@ -80,7 +84,7 @@ export const generateItemFromFilename = async (options: {
   }
   // normal files
   else {
-    const mimetype = mime.lookup(filename);
+    const mimetype = await asyncDetectFile(filepath);
     const { size } = stats;
 
     // upload file
@@ -98,6 +102,7 @@ export const generateItemFromFilename = async (options: {
           mimetype,
         },
       },
+      settings: buildSettings(mimetype.startsWith('image')),
     };
   }
 };

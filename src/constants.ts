@@ -8,3 +8,7 @@ export enum ItemType {
   DOCUMENT = 'document',
   FOLDER = 'folder',
 }
+
+export const buildSettings = (hasThumbnail) => ({
+  hasThumbnail,
+});
