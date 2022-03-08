@@ -1,5 +1,5 @@
 import { FastifyLoggerInstance } from 'fastify';
-import { Item } from 'graasp';
+import { Item, ItemTaskManager, TaskRunner, Member, Actor } from 'graasp';
 import fs from 'fs';
 import path from 'path';
 import { readFile } from 'fs/promises';
@@ -8,6 +8,9 @@ import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
+import FileService from 'graasp-plugin-file/dist/fileServices/interface/fileService';
+import { Archiver } from 'archiver';
+import { FileItemExtra, FileTaskManager, S3FileItemExtra } from 'graasp-plugin-file';
 
 export const generateItemFromFilename = async (options: {
   filename: string;
@@ -157,22 +160,36 @@ export const buildTextContent = (url: string, type: ItemType): string => {
   return `[InternetShortcut]\n${url}\nAppURL=1\n`;
 };
 
-export const addItemToZip = async (
-  item: Item,
-  dirPath,
-  archive,
-  member,
-  fileServiceType,
-  iTM,
-  runner,
-) => {
+export const addItemToZip = async (args: {
+  item: Item;
+  dirPath: string;
+  archive: Archiver;
+  member: Member;
+  fileServiceType: string;
+  iTM: ItemTaskManager;
+  runner: TaskRunner<Actor>;
+  fileTaskManager: FileTaskManager;
+}) => {
+  const { item, dirPath, archive, member, fileServiceType, iTM, runner, fileTaskManager } = args;
   // get item and its related data
   const itemExtra = item.extra as Extra;
 
   switch (item.type) {
-    case fileServiceType:
-      // TODO: add uploaded files into zip
+    case fileServiceType: {
+      const s3Extra = item.extra as S3FileItemExtra;
+      const { path: filepath, mimetype } = s3Extra.s3File;
+      const task = fileTaskManager.createDownloadFileTask(member, {
+        filepath,
+        itemId: item.id,
+        mimetype,
+      });
+      const res = await runner.runSingle(task);
+      console.log('res: ', res);
+      archive.append('data', {
+        name: path.join(dirPath, `${item.name}.${mimetype}`),
+      });
       break;
+    }
     case ItemType.DOCUMENT:
       archive.append(itemExtra.document?.content, {
         name: path.join(dirPath, `${item.name}.graasp`),
@@ -188,12 +205,12 @@ export const addItemToZip = async (
         name: path.join(dirPath, `${item.name}.url`),
       });
       break;
-    case ItemType.FOLDER:
+    case ItemType.FOLDER: {
       // append description
-      dirPath = path.join(dirPath, item.name);
+      const folderPath = path.join(dirPath, item.name);
       if (item.description) {
         archive.append(item.description, {
-          name: path.join(dirPath, `${item.name}.description.html`),
+          name: path.join(folderPath, `${item.name}.description.html`),
         });
       }
       // eslint-disable-next-line no-case-declarations
@@ -202,8 +219,18 @@ export const addItemToZip = async (
       );
       console.log(subItems);
       (subItems as Item[]).forEach((subItem) => {
-        addItemToZip(subItem, dirPath, archive, member, fileServiceType, iTM, runner);
+        addItemToZip({
+          item: subItem,
+          dirPath: folderPath,
+          archive,
+          member,
+          fileServiceType,
+          iTM,
+          runner,
+          fileTaskManager,
+        });
       });
+    }
   }
 };
 
