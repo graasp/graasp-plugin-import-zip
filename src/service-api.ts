@@ -213,15 +213,7 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       archive.pipe(reply.raw);
 
       const rootPath = path.dirname(ROOT_PATH);
-      await addItemToZip(
-        item,
-        rootPath,
-        archive,
-        member,
-        SERVICE_ITEM_TYPE,
-        iTM,
-        runner
-      );
+      await addItemToZip(item, rootPath, archive, member, SERVICE_ITEM_TYPE, iTM, runner);
 
       archive.finalize();
       return reply;

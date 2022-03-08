@@ -182,7 +182,7 @@ describe('Export Zip', () => {
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.headers['content-type']).toBe('application/octet-stream');
-    expect(res.headers['content-disposition']).toBe(`filename=\"${ITEM_FOLDER.name}.zip\"`);
+    expect(res.headers['content-disposition']).toBe(`filename="${ITEM_FOLDER.name}.zip"`);
 
     // recursively handle zip content
     expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.length);

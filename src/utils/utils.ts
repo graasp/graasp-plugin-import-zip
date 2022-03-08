@@ -157,7 +157,15 @@ export const buildTextContent = (url: string, type: ItemType): string => {
   return `[InternetShortcut]\n${url}\nAppURL=1\n`;
 };
 
-export const addItemToZip = async (item: Item, dirPath, archive, member, fileServiceType, iTM, runner) => {
+export const addItemToZip = async (
+  item: Item,
+  dirPath,
+  archive,
+  member,
+  fileServiceType,
+  iTM,
+  runner,
+) => {
   // get item and its related data
   const itemExtra = item.extra as Extra;
 
@@ -190,7 +198,7 @@ export const addItemToZip = async (item: Item, dirPath, archive, member, fileSer
       }
       // eslint-disable-next-line no-case-declarations
       const subItems = await runner.runSingleSequence(
-        iTM.createGetChildrenTaskSequence(member, item.id, true)
+        iTM.createGetChildrenTaskSequence(member, item.id, true),
       );
       console.log(subItems);
       (subItems as Item[]).forEach((subItem) => {
