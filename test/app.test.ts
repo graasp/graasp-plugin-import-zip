@@ -179,12 +179,11 @@ describe('Export Zip', () => {
       url: `/zip-export/${ITEM_FOLDER.id}`,
       headers: new FormData().getHeaders(),
     });
-
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.headers['content-type']).toBe('application/octet-stream');
     expect(res.headers['content-disposition']).toBe(`filename="${ITEM_FOLDER.name}.zip"`);
     expect(res.rawPayload).toBeTruthy();
-    // expect(res.headers['content-length']).not.toBe('0')
+    expect(res.headers['content-length']).not.toBe('0');
 
     // recursively handle zip content
     expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.length);

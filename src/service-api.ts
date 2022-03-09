@@ -215,8 +215,6 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         throw err;
       });
 
-      // archive.pipe(reply.raw);
-
       // path to save files temporarly
       const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, item.id);
       await mkdir(fileStorage, { recursive: true });
@@ -227,7 +225,6 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
 
       // path used to index files in archive
       const rootPath = path.dirname('./');
-
       await addItemToZip({
         item,
         archiveRootPath: rootPath,
@@ -240,16 +237,24 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         fileStorage,
       });
 
-      await archive.finalize();
+      // zipStream.end()
+      const sendBufferPromise = new Promise((resolve, reject) => {
+        zipStream.on('close', () => {
+          // pipe archive data to the response
+          // reply.raw.setHeader('Content-Type', 'application/octet-stream');
+          const buffer = fs.readFileSync(zipPath, 'utf8');
+          console.log('buffer: ', buffer);
+          reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
+          reply.raw.setHeader('Content-Length', buffer.length);
 
-      // pipe archive data to the response
-      // reply.raw.setHeader('Content-Type', 'application/octet-stream');
-      const buffer = fs.readFileSync(zipPath);
-      reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
-      reply.raw.setHeader('Content-Length', buffer.length);
+          reply.type('application/octet-stream');
+          reply.send(buffer);
+          resolve(buffer);
+        });
+      });
 
-      reply.type('application/octet-stream');
-      reply.send(buffer);
+      archive.finalize();
+      await sendBufferPromise;
     },
     // onResponse: async (request) => {
     //   // delete tmp files after download responded
