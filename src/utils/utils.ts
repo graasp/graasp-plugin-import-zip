@@ -185,10 +185,13 @@ export const addItemToZip = async (args: {
   const itemExtra = item.extra as Extra;
 
   switch (item.type) {
+    // todo: local file service
     case fileServiceType: {
       // TODO: s3 file not found
       const s3Extra = item.extra as S3FileItemExtra;
       const { path: filepath, mimetype } = s3Extra.s3File;
+      // get file stream
+      // TODO: handle s3 file not found
       const task = fileTaskManager.createDownloadFileTask(member, {
         filepath,
         itemId: item.id,
@@ -204,6 +207,7 @@ export const addItemToZip = async (args: {
       }
       const filename = `${path.basename(item.name, ext)}.${ext}`;
 
+      // add file in archive
       archive.append(fileStream, {
         name: path.join(archiveRootPath, filename),
       });

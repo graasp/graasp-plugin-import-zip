@@ -186,24 +186,18 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
     },
   );
 
-  // fastify.addHook('onResponse', async (request) => {
-  //   // delete tmp files after download responded
-  //   const itemId = (request?.params as { itemId: string })?.itemId as string;
-  //   const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
-  //   fs.rmSync(fileStorage, { recursive: true });
-  // });
-
   // download item as zip
   fastify.route<{ Params: { itemId: string } }>({
     method: 'GET',
     url: '/zip-export/:itemId',
     schema: zipExport,
     handler: async ({ member, params: { itemId }, log }, reply) => {
+      // get item info
       const getItemTask = iTM.createGetTask(member, itemId);
       const item = await runner.runSingle(getItemTask);
 
+      // init archive
       const archive = archiver.create('zip', { store: true });
-
       archive.on('warning', function (err) {
         if (err.code === 'ENOENT') {
           log.debug(err);
@@ -215,16 +209,17 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         throw err;
       });
 
-      // path to save files temporarly
+      // path to save files temporarly and save archive
       const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, item.id);
       await mkdir(fileStorage, { recursive: true });
       const zipPath = path.join(fileStorage, item.id + '.zip');
-
       const zipStream = fs.createWriteStream(zipPath);
       archive.pipe(zipStream);
 
       // path used to index files in archive
       const rootPath = path.dirname('./');
+
+      // create files from items
       await addItemToZip({
         item,
         archiveRootPath: rootPath,
@@ -237,6 +232,7 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         fileStorage,
       });
 
+      // wait for zip to be completely created
       const sendBufferPromise = new Promise((resolve, reject) => {
         zipStream.on('error', reject);
 
@@ -251,10 +247,10 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       });
 
       archive.finalize();
-      await sendBufferPromise;
+      return sendBufferPromise;
     },
     onResponse: async (request) => {
-      // delete tmp files after download responded
+      // delete tmp files after endpoint responded
       const itemId = (request?.params as { itemId: string })?.itemId as string;
       const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
       fs.rmSync(fileStorage, { recursive: true });
