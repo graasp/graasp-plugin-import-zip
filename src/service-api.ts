@@ -237,18 +237,15 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         fileStorage,
       });
 
-      // zipStream.end()
       const sendBufferPromise = new Promise((resolve, reject) => {
+        zipStream.on('error', reject);
+
         zipStream.on('close', () => {
           // pipe archive data to the response
-          // reply.raw.setHeader('Content-Type', 'application/octet-stream');
-          const buffer = fs.readFileSync(zipPath, 'utf8');
-          console.log('buffer: ', buffer);
+          const buffer = fs.readFileSync(zipPath);
           reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
-          reply.raw.setHeader('Content-Length', buffer.length);
-
-          reply.type('application/octet-stream');
-          reply.send(buffer);
+          reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
+          reply.type('application/zip');
           resolve(buffer);
         });
       });
@@ -256,12 +253,12 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       archive.finalize();
       await sendBufferPromise;
     },
-    // onResponse: async (request) => {
-    //   // delete tmp files after download responded
-    //   const itemId = (request?.params as { itemId: string })?.itemId as string;
-    //   const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
-    //   fs.rmSync(fileStorage, { recursive: true });
-    // },
+    onResponse: async (request) => {
+      // delete tmp files after download responded
+      const itemId = (request?.params as { itemId: string })?.itemId as string;
+      const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
+      fs.rmSync(fileStorage, { recursive: true });
+    },
   });
 };
 
