@@ -186,11 +186,19 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
     },
   );
 
+  // fastify.addHook('onResponse', async (request) => {
+  //   // delete tmp files after download responded
+  //   const itemId = (request?.params as { itemId: string })?.itemId as string;
+  //   const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
+  //   fs.rmSync(fileStorage, { recursive: true });
+  // });
+
   // download item as zip
-  fastify.get<{ Params: { itemId: string } }>(
-    '/zip-export/:itemId',
-    { schema: zipExport },
-    async ({ member, params: { itemId }, log }, reply) => {
+  fastify.route<{ Params: { itemId: string } }>({
+    method: 'GET',
+    url: '/zip-export/:itemId',
+    schema: zipExport,
+    handler: async ({ member, params: { itemId }, log }, reply) => {
       const getItemTask = iTM.createGetTask(member, itemId);
       const item = await runner.runSingle(getItemTask);
 
@@ -207,16 +215,18 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         throw err;
       });
 
-      // pipe archive data to the response
-      reply.raw.setHeader('Content-Type', 'application/octet-stream');
-      reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
-      archive.pipe(reply.raw);
+      // archive.pipe(reply.raw);
+
+      // path to save files temporarly
+      const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, item.id);
+      await mkdir(fileStorage, { recursive: true });
+      const zipPath = path.join(fileStorage, item.id + '.zip');
+
+      const zipStream = fs.createWriteStream(zipPath);
+      archive.pipe(zipStream);
 
       // path used to index files in archive
       const rootPath = path.dirname('./');
-
-      // path to save files temporarly
-      const fileStorage = path.join(TMP_FOLDER_PATH, item.id);
 
       await addItemToZip({
         item,
@@ -232,10 +242,22 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
 
       await archive.finalize();
 
-      // delete tmp files
-      fs.rmSync(fileStorage, { recursive: true });
+      // pipe archive data to the response
+      // reply.raw.setHeader('Content-Type', 'application/octet-stream');
+      const buffer = fs.readFileSync(zipPath);
+      reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
+      reply.raw.setHeader('Content-Length', buffer.length);
+
+      reply.type('application/octet-stream');
+      reply.send(buffer);
     },
-  );
+    // onResponse: async (request) => {
+    //   // delete tmp files after download responded
+    //   const itemId = (request?.params as { itemId: string })?.itemId as string;
+    //   const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
+    //   fs.rmSync(fileStorage, { recursive: true });
+    // },
+  });
 };
 
 export default plugin;

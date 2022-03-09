@@ -237,7 +237,6 @@ export const addItemToZip = async (args: {
       const subItems = await runner.runSingleSequence(
         iTM.createGetChildrenTaskSequence(member, item.id, true),
       );
-      console.log(subItems);
       await Promise.all(
         (subItems as Item[]).map((subItem) =>
           addItemToZip({
@@ -256,16 +255,3 @@ export const addItemToZip = async (args: {
     }
   }
 };
-
-// TODO: download file from S3
-// const extraFile = item.extra?.s3File as ExtraFile;
-// const filePath = `${extraFile.path}/${extraFile.name}`;
-// const downloadTask = fTM.createDownloadFileTask(member, {
-//   reply,
-//   itemId: item.id,
-//   filepath: extraFile.path,
-//   mimetype: extraFile.mimetype,
-// });
-// const file = await runner.runSingle(downloadTask);
-// console.log('received file', file);
-// archive.append(fs.createReadStream(file as PathLike), { name: `${extraFile.name}` });
