@@ -10,7 +10,7 @@ import { pipeline } from 'stream/promises';
 import { readFile } from 'fs/promises';
 import fastifyMultipart from 'fastify-multipart';
 import { Item } from 'graasp';
-import { DESCRIPTION_EXTENTION, ROOT_PATH, ItemType, TMP_FOLDER_PATH } from './constants';
+import { DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from './constants';
 import { zipExport, zipImport } from './schemas/schema';
 import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import {
@@ -212,19 +212,28 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
       archive.pipe(reply.raw);
 
-      const rootPath = path.dirname(ROOT_PATH);
+      // path used to index files in archive
+      const rootPath = path.dirname('./');
+
+      // path to save files temporarly
+      const fileStorage = path.join(TMP_FOLDER_PATH, item.id);
+
       await addItemToZip({
         item,
-        dirPath: rootPath,
+        archiveRootPath: rootPath,
         archive,
         member,
         fileServiceType: SERVICE_ITEM_TYPE,
         iTM,
         runner,
         fileTaskManager: fTM,
+        fileStorage,
       });
 
-      archive.finalize();
+      await archive.finalize();
+
+      // delete tmp files
+      fs.rmSync(fileStorage, { recursive: true });
     },
   );
 };
