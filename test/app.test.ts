@@ -180,7 +180,7 @@ describe('Export Zip', () => {
       headers: new FormData().getHeaders(),
     });
     expect(res.statusCode).toBe(StatusCodes.OK);
-    expect(res.headers['content-type']).toBe('application/octet-stream');
+    expect(res.headers['content-type']).toBe('application/zip');
     expect(res.headers['content-disposition']).toBe(`filename="${ITEM_FOLDER.name}.zip"`);
     expect(res.rawPayload).toBeTruthy();
     expect(res.headers['content-length']).not.toBe('0');

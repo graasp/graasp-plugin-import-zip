@@ -5,11 +5,11 @@ import path from 'path';
 import { readFile } from 'fs/promises';
 import mime from 'mime-types';
 import { DESCRIPTION_EXTENTION, ItemType } from '../constants';
-import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+import { FILE_ITEM_TYPES, ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
 import { Archiver } from 'archiver';
-import { FileTaskManager, S3FileItemExtra } from 'graasp-plugin-file';
+import { FileTaskManager, LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
 
 export const generateItemFromFilename = async (options: {
   filename: string;
@@ -185,32 +185,43 @@ export const addItemToZip = async (args: {
   const itemExtra = item.extra as Extra;
 
   switch (item.type) {
-    // todo: local file service
     case fileServiceType: {
-      // TODO: s3 file not found
-      const s3Extra = item.extra as S3FileItemExtra;
-      const { path: filepath, mimetype } = s3Extra.s3File;
+      let filepath = '';
+      let mimetype = '';
+      // check for service type and assign filepath, mimetype respectively
+      if (fileServiceType === FILE_ITEM_TYPES.S3) {
+        const s3Extra = item.extra as S3FileItemExtra;
+        ({ path: filepath, mimetype } = s3Extra.s3File);
+      } else {
+        const fileExtra = item.extra as LocalFileItemExtra;
+        ({ path: filepath, mimetype } = fileExtra.file);
+      }
       // get file stream
-      // TODO: handle s3 file not found
       const task = fileTaskManager.createDownloadFileTask(member, {
         filepath,
         itemId: item.id,
         mimetype,
         fileStorage,
       });
-      const fileStream = (await runner.runSingle(task)) as ReadStream;
 
-      // build filename with extension if does not exist
-      let ext = path.extname(item.name);
-      if (!ext) {
-        ext = mime.extension(mimetype);
+      // TODO: better handling of File Not Found
+      try {
+        const fileStream = (await runner.runSingle(task)) as ReadStream;
+        // build filename with extension if does not exist
+        let ext = path.extname(item.name);
+        if (!ext) {
+          ext = mime.extension(mimetype);
+        }
+        const filename = `${path.basename(item.name, ext)}.${ext}`;
+
+        // add file in archive
+        archive.append(fileStream, {
+          name: path.join(archiveRootPath, filename),
+        });
+      } catch (error) {
+        console.log(error);
+        break;
       }
-      const filename = `${path.basename(item.name, ext)}.${ext}`;
-
-      // add file in archive
-      archive.append(fileStream, {
-        name: path.join(archiveRootPath, filename),
-      });
 
       break;
     }
