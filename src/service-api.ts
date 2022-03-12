@@ -220,17 +220,21 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
       const rootPath = path.dirname('./');
 
       // create files from items
-      await addItemToZip({
-        item,
-        archiveRootPath: rootPath,
-        archive,
-        member,
-        fileServiceType: SERVICE_ITEM_TYPE,
-        iTM,
-        runner,
-        fileTaskManager: fTM,
-        fileStorage,
-      });
+      try {
+        await addItemToZip({
+          item,
+          archiveRootPath: rootPath,
+          archive,
+          member,
+          fileServiceType: SERVICE_ITEM_TYPE,
+          iTM,
+          runner,
+          fileTaskManager: fTM,
+          fileStorage,
+        });
+      } catch (error) {
+        throw new Error('Error during exporting zip');
+      }
 
       // wait for zip to be completely created
       const sendBufferPromise = new Promise((resolve, reject) => {

@@ -204,24 +204,18 @@ export const addItemToZip = async (args: {
         fileStorage,
       });
 
-      // TODO: better handling of File Not Found
-      try {
-        const fileStream = (await runner.runSingle(task)) as ReadStream;
-        // build filename with extension if does not exist
-        let ext = path.extname(item.name);
-        if (!ext) {
-          ext = mime.extension(mimetype);
-        }
-        const filename = `${path.basename(item.name, ext)}.${ext}`;
-
-        // add file in archive
-        archive.append(fileStream, {
-          name: path.join(archiveRootPath, filename),
-        });
-      } catch (error) {
-        console.log(error);
-        break;
+      const fileStream = (await runner.runSingle(task)) as ReadStream;
+      // build filename with extension if does not exist
+      let ext = path.extname(item.name);
+      if (!ext) {
+        ext = mime.extension(mimetype);
       }
+      const filename = `${path.basename(item.name, ext)}.${ext}`;
+
+      // add file in archive
+      archive.append(fileStream, {
+        name: path.join(archiveRootPath, filename),
+      });
 
       break;
     }

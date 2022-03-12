@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { ItemType } from '../src/constants';
 
 export const FIXTURE_LIGHT_COLOR_ZIP_PATH = './fixtures/lightColor.zip';
@@ -47,3 +48,10 @@ export const SUB_ITEMS = [
     type: ItemType.FOLDER,
   },
 ];
+
+export const NON_EXISTING_FILE = {
+  id: v4(),
+  name: 'not_existing_item',
+  path: 'path',
+  type: ItemType.LOCALFILE,
+};

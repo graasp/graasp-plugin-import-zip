@@ -8,6 +8,7 @@ import {
   FIXTURE_IMAGE_PATH,
   FIXTURE_LIGHT_COLOR_ZIP_PATH,
   ITEM_FOLDER,
+  NON_EXISTING_FILE,
   SUB_ITEMS,
   TMP_FOLDER_PATH,
 } from './constants';
@@ -149,8 +150,14 @@ describe('Import Zip', () => {
 describe('Export Zip', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => task.result);
+    const getFileTask = new MockTask(null);
+    jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => {
+      if (task == getFileTask) {
+        throw Error('file not found');
+      } else {
+        return task.result;
+      }
+    });
     jest.spyOn(runner, 'runSingleSequence').mockImplementation(async (tasks) => tasks[0].result);
   });
 
@@ -187,5 +194,21 @@ describe('Export Zip', () => {
 
     // recursively handle zip content
     expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.length);
+  });
+  it('Throw if file not found', async () => {
+    const app = await build({
+      taskManager,
+      runner,
+    });
+
+    const getFileTask = new MockTask(null);
+    jest.spyOn(taskManager, 'createGetTask').mockImplementation(() => getFileTask);
+
+    const res = await app.inject({
+      method: 'GET',
+      url: `/zip-export/${NON_EXISTING_FILE.id}`,
+      headers: new FormData().getHeaders(),
+    });
+    expect(res.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
   });
 });

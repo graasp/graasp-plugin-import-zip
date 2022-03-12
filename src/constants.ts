@@ -9,4 +9,6 @@ export enum ItemType {
   APP = 'app',
   DOCUMENT = 'document',
   FOLDER = 'folder',
+  S3FILE = 's3File',
+  LOCALFILE = 'file',
 }
