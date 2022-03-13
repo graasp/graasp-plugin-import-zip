@@ -3808,8 +3808,8 @@ __metadata:
     husky: 7.0.4
     jest: ^27.4.7
     mime-types: 2.1.34
-    path: 0.12.7
     mmmagic: 0.5.3
+    path: 0.12.7
     prettier: ^2.5.1
     qs: ^6.10.2
     slonik: ^27.1.0
@@ -5274,7 +5274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-types@npm:^2.1.12":
+"mime-types@npm:2.1.34, mime-types@npm:^2.1.12":
   version: 2.1.34
   resolution: "mime-types@npm:2.1.34"
   dependencies:
