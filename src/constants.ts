@@ -12,3 +12,7 @@ export enum ItemType {
   S3FILE = 's3File',
   LOCALFILE = 'file',
 }
+
+export const buildSettings = (hasThumbnail) => ({
+  hasThumbnail,
+});
