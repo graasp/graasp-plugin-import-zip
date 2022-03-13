@@ -10,6 +10,7 @@ import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from 
 import { InvalidArchiveStructureError } from './errors';
 import { Archiver } from 'archiver';
 import { FileTaskManager, LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
+import extract from 'extract-zip';
 
 export const generateItemFromFilename = async (options: {
   filename: string;
@@ -208,9 +209,11 @@ export const addItemToZip = async (args: {
       // build filename with extension if does not exist
       let ext = path.extname(item.name);
       if (!ext) {
-        ext = mime.extension(mimetype);
+        // only add a dot in case of building file name with mimetype, otherwise there will be two dots in file name
+        ext = `.${mime.extension(mimetype)}`;
       }
-      const filename = `${path.basename(item.name, ext)}.${ext}`;
+      // remove . here to avoid double . in filename
+      const filename = `${path.basename(item.name, ext)}${ext}`;
 
       // add file in archive
       archive.append(fileStream, {

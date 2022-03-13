@@ -34,6 +34,32 @@ export const ITEM_APP = {
   ...BASE_ITEM,
   type: ItemType.APP,
 };
+export const ITEM_LOCAL = {
+  ...BASE_ITEM,
+  type: ItemType.LOCALFILE,
+  name: 'file.txt',
+  extra: {
+    file: {
+      name: 'file.txt',
+      path: 'filePath',
+      mimetype: 'text/plain',
+      size: 'fileSize',
+    }
+  },
+};
+export const ITEM_S3 = {
+  ...BASE_ITEM,
+  type: ItemType.S3FILE,
+  name: 's3File.txt',
+  extra: {
+    s3File: {
+      name: 's3File.txt',
+      path: 's3FilePath',
+      mimetype: 'text/plain',
+      size: 's3FileSize',
+    }
+  },
+};
 export const SUB_ITEMS = [
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130004',
@@ -45,7 +71,34 @@ export const SUB_ITEMS = [
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130003',
     name: 'public_item2',
     path: 'ecafbd2a_5688_11eb_ae93_0242ac130002.fdf09f5a_5688_11eb_ae93_0242ac130003',
-    type: ItemType.FOLDER,
+    type: ItemType.DOCUMENT,
+    extra: {
+      document: {
+        content: '',
+      },
+    },
+  },
+  {
+    id: 'fdf09f5a-5688-11eb-ae93-0242ac130002',
+    name: 'public_item3',
+    path: 'ecafbd2a_5688_11eb_ae93_0242ac130002.fdf09f5a_5688_11eb_ae93_0242ac130002',
+    type: ItemType.APP,
+    extra: {
+      app: {
+        url: '',
+      },
+    },
+  },
+  {
+    id: 'fdf09f5a-5688-11eb-ae93-0242ac130001',
+    name: 'public_item4',
+    path: 'ecafbd2a_5688_11eb_ae93_0242ac130002.fdf09f5a_5688_11eb_ae93_0242ac130001',
+    type: ItemType.LINK,
+    extra: {
+      embeddedLink: {
+        url: '',
+      },
+    },
   },
 ];
 

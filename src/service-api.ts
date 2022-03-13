@@ -233,7 +233,7 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
           fileStorage,
         });
       } catch (error) {
-        throw new Error('Error during exporting zip');
+        throw new Error(`Error during exporting zip: ${error}`);
       }
 
       // wait for zip to be completely created

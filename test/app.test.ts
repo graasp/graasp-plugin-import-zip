@@ -8,13 +8,16 @@ import {
   FIXTURE_IMAGE_PATH,
   FIXTURE_LIGHT_COLOR_ZIP_PATH,
   ITEM_FOLDER,
+  ITEM_LOCAL,
   NON_EXISTING_FILE,
   SUB_ITEMS,
   TMP_FOLDER_PATH,
 } from './constants';
-import build from './app';
+import build, { DEFAULT_OPTIONS } from './app';
 import MockTask from 'graasp-test/src/tasks/task';
 import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixtures/lightColor';
+import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { ItemType } from '../src/constants';
 
 const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();
@@ -152,7 +155,7 @@ describe('Export Zip', () => {
     jest.clearAllMocks();
     const getFileTask = new MockTask(null);
     jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => {
-      if (task == getFileTask) {
+      if (task === getFileTask) {
         throw Error('file not found');
       } else {
         return task.result;
@@ -193,8 +196,9 @@ describe('Export Zip', () => {
     expect(res.headers['content-length']).not.toBe('0');
 
     // recursively handle zip content
-    expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.length);
+    expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.filter((item) => item.type === ItemType.FOLDER).length);
   });
+
   it('Throw if file not found', async () => {
     const app = await build({
       taskManager,
@@ -203,6 +207,16 @@ describe('Export Zip', () => {
 
     const getFileTask = new MockTask(null);
     jest.spyOn(taskManager, 'createGetTask').mockImplementation(() => getFileTask);
+    const fileTaskManager = new FileTaskManager(
+      DEFAULT_OPTIONS.serviceOptions,
+      ServiceMethod.LOCAL,
+    );
+
+    jest
+      .spyOn(fileTaskManager, 'createDownloadFileTask')
+      .mockImplementation(() => {
+        return getFileTask;
+      });
 
     const res = await app.inject({
       method: 'GET',
