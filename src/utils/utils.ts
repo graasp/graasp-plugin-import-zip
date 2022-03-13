@@ -10,7 +10,6 @@ import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from 
 import { InvalidArchiveStructureError } from './errors';
 import { Archiver } from 'archiver';
 import { FileTaskManager, LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
-import extract from 'extract-zip';
 
 export const generateItemFromFilename = async (options: {
   filename: string;

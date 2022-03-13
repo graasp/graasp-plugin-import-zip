@@ -8,7 +8,6 @@ import {
   FIXTURE_IMAGE_PATH,
   FIXTURE_LIGHT_COLOR_ZIP_PATH,
   ITEM_FOLDER,
-  ITEM_LOCAL,
   NON_EXISTING_FILE,
   SUB_ITEMS,
   TMP_FOLDER_PATH,
@@ -196,7 +195,9 @@ describe('Export Zip', () => {
     expect(res.headers['content-length']).not.toBe('0');
 
     // recursively handle zip content
-    expect(createGetChildrenTask).toHaveBeenCalledTimes(1 + SUB_ITEMS.filter((item) => item.type === ItemType.FOLDER).length);
+    expect(createGetChildrenTask).toHaveBeenCalledTimes(
+      1 + SUB_ITEMS.filter((item) => item.type === ItemType.FOLDER).length,
+    );
   });
 
   it('Throw if file not found', async () => {
@@ -212,11 +213,9 @@ describe('Export Zip', () => {
       ServiceMethod.LOCAL,
     );
 
-    jest
-      .spyOn(fileTaskManager, 'createDownloadFileTask')
-      .mockImplementation(() => {
-        return getFileTask;
-      });
+    jest.spyOn(fileTaskManager, 'createDownloadFileTask').mockImplementation(() => {
+      return getFileTask;
+    });
 
     const res = await app.inject({
       method: 'GET',

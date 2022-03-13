@@ -18,8 +18,8 @@ import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import MockTask from 'graasp-test/src/tasks/task';
 import { DEFAULT_OPTIONS } from '../../test/app';
-import { FIXTURE_IMAGE_PATH, FIXTURE_LIGHT_COLOR_ZIP_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
+import { FIXTURE_IMAGE_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
+import { TaskRunner } from 'graasp-test';
 import archiver from 'archiver';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
@@ -282,7 +282,9 @@ describe('Utils', () => {
         .mockImplementation((member, { itemId }) => {
           if (ITEM_LOCAL.id === itemId)
             // set task result to a valid readstream, content doesn't matter here
-            return new MockTask(createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)));
+            return new MockTask(
+              createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
+            );
           else return new MockTask(null);
         });
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
@@ -314,7 +316,9 @@ describe('Utils', () => {
         .mockImplementation((member, { itemId }) => {
           if (ITEM_S3.id === itemId)
             // set task result to a valid readstream, content doesn't matter here
-            return new MockTask(createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)));
+            return new MockTask(
+              createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
+            );
           else return new MockTask(null);
         });
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {

@@ -22,18 +22,7 @@ export const ITEM_FOLDER = {
   ...BASE_ITEM,
   type: ItemType.FOLDER,
 };
-export const ITEM_DOCUMENT = {
-  ...BASE_ITEM,
-  type: ItemType.DOCUMENT,
-};
-export const ITEM_LINK = {
-  ...BASE_ITEM,
-  type: ItemType.LINK,
-};
-export const ITEM_APP = {
-  ...BASE_ITEM,
-  type: ItemType.APP,
-};
+
 export const ITEM_LOCAL = {
   ...BASE_ITEM,
   type: ItemType.LOCALFILE,
@@ -44,7 +33,7 @@ export const ITEM_LOCAL = {
       path: 'filePath',
       mimetype: 'text/plain',
       size: 'fileSize',
-    }
+    },
   },
 };
 export const ITEM_S3 = {
@@ -57,7 +46,7 @@ export const ITEM_S3 = {
       path: 's3FilePath',
       mimetype: 'text/plain',
       size: 's3FileSize',
-    }
+    },
   },
 };
 export const SUB_ITEMS = [
