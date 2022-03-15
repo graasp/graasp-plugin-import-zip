@@ -189,6 +189,7 @@ export const addItemToZip = async (args: {
   } = args;
   // get item and its related data
   const itemExtra = item.extra as Extra;
+  let subItems = null;
 
   switch (item.type) {
     case fileServiceType: {
@@ -198,9 +199,12 @@ export const addItemToZip = async (args: {
       if (fileServiceType === FILE_ITEM_TYPES.S3) {
         const s3Extra = item.extra as S3FileItemExtra;
         ({ path: filepath, mimetype } = s3Extra.s3File);
-      } else {
+      } else if (fileServiceType === FILE_ITEM_TYPES.LOCAL) {
         const fileExtra = item.extra as LocalFileItemExtra;
         ({ path: filepath, mimetype } = fileExtra.file);
+      } else {
+        // throw if service type is neither
+        console.error(`fileServiceType invalid: ${fileServiceType}`);
       }
       // get file stream
       const task = fileTaskManager.createDownloadFileTask(member, {
@@ -210,6 +214,7 @@ export const addItemToZip = async (args: {
         fileStorage,
       });
 
+      // if file not found, an error will be thrown by this line
       const fileStream = (await runner.runSingle(task)) as ReadStream;
       // build filename with extension if does not exist
       let ext = path.extname(item.name);
@@ -217,7 +222,6 @@ export const addItemToZip = async (args: {
         // only add a dot in case of building file name with mimetype, otherwise there will be two dots in file name
         ext = `.${mime.extension(mimetype)}`;
       }
-      // remove . here to avoid double . in filename
       const filename = `${path.basename(item.name, ext)}${ext}`;
 
       // add file in archive
@@ -251,11 +255,11 @@ export const addItemToZip = async (args: {
         });
       }
       // eslint-disable-next-line no-case-declarations
-      const subItems = await runner.runSingleSequence(
+      subItems = await runner.runSingleSequence(
         iTM.createGetChildrenTaskSequence(member, item.id, true),
       );
       await Promise.all(
-        (subItems as Item[]).map((subItem) =>
+        subItems.map((subItem) =>
           addItemToZip({
             item: subItem,
             archiveRootPath: folderPath,

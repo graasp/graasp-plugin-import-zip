@@ -27,6 +27,16 @@ const DEFAULT_FILE_SERVICE_TYPE = 'file';
 const DEFAULT_PARENT_ID = 'parentId';
 const DEFAULT_LOGGER = {} as unknown as FastifyLoggerInstance;
 
+const buildMock = (taskManager: FileTaskManager, mockItem) =>
+  jest.spyOn(taskManager, 'createDownloadFileTask').mockImplementation((member, { itemId }) => {
+    if (mockItem.id === itemId)
+      // set task result to a valid readstream, content doesn't matter here
+      return new MockTask(
+        createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
+      );
+    else return new MockTask(null);
+  });
+
 describe('Utils', () => {
   describe('generateItemFromFilename', () => {
     it('Hidden file', async () => {
@@ -310,17 +320,7 @@ describe('Utils', () => {
         DEFAULT_OPTIONS.serviceOptions,
         ServiceMethod.LOCAL,
       );
-
-      jest
-        .spyOn(localFileTaskManager, 'createDownloadFileTask')
-        .mockImplementation((member, { itemId }) => {
-          if (ITEM_LOCAL.id === itemId)
-            // set task result to a valid readstream, content doesn't matter here
-            return new MockTask(
-              createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
-            );
-          else return new MockTask(null);
-        });
+      buildMock(localFileTaskManager, ITEM_LOCAL);
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
         expect(name).toEqual(ITEM_LOCAL.name);
         return archiverMock;
@@ -344,17 +344,7 @@ describe('Utils', () => {
         DEFAULT_OPTIONS.serviceOptions,
         ServiceMethod.S3,
       );
-
-      jest
-        .spyOn(S3FileTaskManager, 'createDownloadFileTask')
-        .mockImplementation((member, { itemId }) => {
-          if (ITEM_S3.id === itemId)
-            // set task result to a valid readstream, content doesn't matter here
-            return new MockTask(
-              createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
-            );
-          else return new MockTask(null);
-        });
+      buildMock(S3FileTaskManager, ITEM_S3);
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
         expect(name).toEqual(ITEM_S3.name);
         return archiverMock;

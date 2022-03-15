@@ -241,7 +241,7 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
         zipStream.on('error', reject);
 
         zipStream.on('close', () => {
-          // pipe archive data to the response
+          // set reply headers depending zip file and return file
           const buffer = fs.readFileSync(zipPath);
           reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
           reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
