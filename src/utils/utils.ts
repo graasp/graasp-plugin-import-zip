@@ -1,14 +1,17 @@
 import { FastifyLoggerInstance } from 'fastify';
-import { Item } from 'graasp';
-import fs from 'fs';
-import util from 'util';
-import mmm from 'mmmagic';
+import { Item, ItemTaskManager, TaskRunner, Member, Actor } from 'graasp';
+import fs, { ReadStream } from 'fs';
 import path from 'path';
 import { readFile } from 'fs/promises';
+import mime from 'mime-types';
+import { FILE_ITEM_TYPES, ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
+import util from 'util';
+import mmm from 'mmmagic';
 import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
-import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
-import type { UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
 import { InvalidArchiveStructureError } from './errors';
+import { Archiver } from 'archiver';
+import { FileTaskManager, LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
 const asyncDetectFile = util.promisify(magic.detectFile.bind(magic));
@@ -152,4 +155,124 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
   }
 
   return true;
+};
+
+// build the file content in case of Link/App
+export const buildTextContent = (url: string, type: ItemType): string => {
+  if (type === ItemType.LINK) {
+    return `[InternetShortcut]\n${url}\n`;
+  }
+  return `[InternetShortcut]\n${url}\nAppURL=1\n`;
+};
+
+export const addItemToZip = async (args: {
+  item: Item;
+  archiveRootPath: string;
+  archive: Archiver;
+  member: Member;
+  fileServiceType: string;
+  iTM: ItemTaskManager;
+  runner: TaskRunner<Actor>;
+  fileTaskManager: FileTaskManager;
+  fileStorage: string;
+}) => {
+  const {
+    item,
+    archiveRootPath,
+    archive,
+    member,
+    fileServiceType,
+    iTM,
+    runner,
+    fileStorage,
+    fileTaskManager,
+  } = args;
+  // get item and its related data
+  const itemExtra = item.extra as Extra;
+  let subItems = null;
+
+  switch (item.type) {
+    case fileServiceType: {
+      let filepath = '';
+      let mimetype = '';
+      // check for service type and assign filepath, mimetype respectively
+      if (fileServiceType === FILE_ITEM_TYPES.S3) {
+        const s3Extra = item.extra as S3FileItemExtra;
+        ({ path: filepath, mimetype } = s3Extra.s3File);
+      } else if (fileServiceType === FILE_ITEM_TYPES.LOCAL) {
+        const fileExtra = item.extra as LocalFileItemExtra;
+        ({ path: filepath, mimetype } = fileExtra.file);
+      } else {
+        // throw if service type is neither
+        console.error(`fileServiceType invalid: ${fileServiceType}`);
+      }
+      // get file stream
+      const task = fileTaskManager.createDownloadFileTask(member, {
+        filepath,
+        itemId: item.id,
+        mimetype,
+        fileStorage,
+      });
+
+      // if file not found, an error will be thrown by this line
+      const fileStream = (await runner.runSingle(task)) as ReadStream;
+      // build filename with extension if does not exist
+      let ext = path.extname(item.name);
+      if (!ext) {
+        // only add a dot in case of building file name with mimetype, otherwise there will be two dots in file name
+        ext = `.${mime.extension(mimetype)}`;
+      }
+      const filename = `${path.basename(item.name, ext)}${ext}`;
+
+      // add file in archive
+      archive.append(fileStream, {
+        name: path.join(archiveRootPath, filename),
+      });
+
+      break;
+    }
+    case ItemType.DOCUMENT:
+      archive.append(itemExtra.document?.content, {
+        name: path.join(archiveRootPath, `${item.name}.graasp`),
+      });
+      break;
+    case ItemType.LINK:
+      archive.append(buildTextContent(itemExtra.embeddedLink?.url, ItemType.LINK), {
+        name: path.join(archiveRootPath, `${item.name}.url`),
+      });
+      break;
+    case ItemType.APP:
+      archive.append(buildTextContent(itemExtra.app?.url, ItemType.APP), {
+        name: path.join(archiveRootPath, `${item.name}.url`),
+      });
+      break;
+    case ItemType.FOLDER: {
+      // append description
+      const folderPath = path.join(archiveRootPath, item.name);
+      if (item.description) {
+        archive.append(item.description, {
+          name: path.join(folderPath, `${item.name}.description.html`),
+        });
+      }
+      // eslint-disable-next-line no-case-declarations
+      subItems = await runner.runSingleSequence(
+        iTM.createGetChildrenTaskSequence(member, item.id, true),
+      );
+      await Promise.all(
+        subItems.map((subItem) =>
+          addItemToZip({
+            item: subItem,
+            archiveRootPath: folderPath,
+            archive,
+            member,
+            fileServiceType,
+            iTM,
+            runner,
+            fileTaskManager,
+            fileStorage,
+          }),
+        ),
+      );
+    }
+  }
 };

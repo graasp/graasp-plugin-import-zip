@@ -12,3 +12,24 @@ export interface GraaspImportZipPluginOptions {
 
 export type UploadFileFunction = ({ filepath, mimetype }) => Promise<string>;
 export type UpdateParentDescriptionFunction = ({ parentId, content }) => Promise<void>;
+
+export type Extra = {
+  s3File?: {
+    name: string;
+    path: string;
+    size: number;
+    mimetype;
+  };
+  document?: {
+    content: string;
+  };
+  embeddedLink?: {
+    url: string;
+    icons: string[];
+    thumbnails;
+  };
+  app?: {
+    url: string;
+    settings;
+  };
+};

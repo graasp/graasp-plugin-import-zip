@@ -11,7 +11,7 @@ type props = {
   options?: GraaspImportZipPluginOptions;
 };
 
-const DEFAULT_OPTIONS = {
+export const DEFAULT_OPTIONS = {
   pathPrefix: 'pathPrefix',
   serviceMethod: ServiceMethod.LOCAL,
   serviceOptions: {

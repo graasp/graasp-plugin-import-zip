@@ -1,6 +1,6 @@
 import path from 'path';
 import { FastifyLoggerInstance } from 'fastify';
-import fs from 'fs';
+import fs, { createReadStream } from 'fs';
 import { readFile } from 'fs/promises';
 import {
   FOLDER_PATH,
@@ -12,13 +12,30 @@ import {
   DOCUMENT_NAME,
   IMAGE_NAME_WITHOUT_EXTENSION,
 } from '../../test/fixtures/utils/fixtureUtils';
-import { generateItemFromFilename, handleItemDescription } from './utils';
+import { addItemToZip, generateItemFromFilename, handleItemDescription } from './utils';
 import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
 import { Item } from 'graasp';
+import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
+import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import MockTask from 'graasp-test/src/tasks/task';
+import { DEFAULT_OPTIONS } from '../../test/app';
+import { FIXTURE_IMAGE_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
+import { TaskRunner } from 'graasp-test';
+import archiver from 'archiver';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
 const DEFAULT_PARENT_ID = 'parentId';
 const DEFAULT_LOGGER = {} as unknown as FastifyLoggerInstance;
+
+const buildMock = (taskManager: FileTaskManager, mockItem) =>
+  jest.spyOn(taskManager, 'createDownloadFileTask').mockImplementation((member, { itemId }) => {
+    if (mockItem.id === itemId)
+      // set task result to a valid readstream, content doesn't matter here
+      return new MockTask(
+        createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
+      );
+    else return new MockTask(null);
+  });
 
 describe('Utils', () => {
   describe('generateItemFromFilename', () => {
@@ -286,6 +303,64 @@ describe('Utils', () => {
       // description content mocked with file name
       // contain instead of equal because of break lines
       expect(items[0].description).toContain(name);
+    });
+  });
+
+  describe('addItemToZip', () => {
+    const archiverMock = archiver.create('zip');
+    const runner = new TaskRunner();
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => task.result);
+    });
+
+    it(ItemType.LOCALFILE, async () => {
+      const localFileTaskManager = new FileTaskManager(
+        DEFAULT_OPTIONS.serviceOptions,
+        ServiceMethod.LOCAL,
+      );
+      buildMock(localFileTaskManager, ITEM_LOCAL);
+      jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
+        expect(name).toEqual(ITEM_LOCAL.name);
+        return archiverMock;
+      });
+
+      await addItemToZip({
+        item: ITEM_LOCAL,
+        archiveRootPath: '',
+        archive: archiverMock,
+        member: null,
+        fileServiceType: FILE_ITEM_TYPES.LOCAL,
+        iTM: null,
+        runner: runner,
+        fileTaskManager: localFileTaskManager,
+        fileStorage: '',
+      });
+    });
+
+    it(ItemType.S3FILE, async () => {
+      const S3FileTaskManager = new FileTaskManager(
+        DEFAULT_OPTIONS.serviceOptions,
+        ServiceMethod.S3,
+      );
+      buildMock(S3FileTaskManager, ITEM_S3);
+      jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
+        expect(name).toEqual(ITEM_S3.name);
+        return archiverMock;
+      });
+
+      await addItemToZip({
+        item: ITEM_S3,
+        archiveRootPath: '',
+        archive: archiverMock,
+        member: null,
+        fileServiceType: FILE_ITEM_TYPES.S3,
+        iTM: null,
+        runner: runner,
+        fileTaskManager: S3FileTaskManager,
+        fileStorage: '',
+      });
     });
   });
 });
