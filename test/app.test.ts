@@ -17,6 +17,12 @@ import MockTask from 'graasp-test/src/tasks/task';
 import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixtures/lightColor';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import { ItemType } from '../src/constants';
+import plugin from '../src/service-api';
+import {
+  mockCreateGetChildrenTaskSequence,
+  mockCreateGetTaskSequence,
+  mockRunSingle,
+} from './mocks';
 
 const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();
@@ -43,6 +49,7 @@ describe('Import Zip', () => {
   describe('/zip-import', () => {
     it('Successfully import zip', async () => {
       const app = await build({
+        plugin,
         taskManager,
         runner,
       });
@@ -82,6 +89,7 @@ describe('Import Zip', () => {
 
     it('Successfully import zip in parent', async () => {
       const app = await build({
+        plugin,
         taskManager,
         runner,
       });
@@ -128,6 +136,7 @@ describe('Import Zip', () => {
 
     it('Throw if file is not a zip archive', async () => {
       const app = await build({
+        plugin,
         taskManager,
         runner,
       });
@@ -153,35 +162,30 @@ describe('Export Zip', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     const getFileTask = new MockTask(null);
-    jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => {
-      if (task === getFileTask) {
-        throw Error('file not found');
-      } else {
-        return task.result;
-      }
-    });
+    mockRunSingle({ runner, task: getFileTask });
     jest.spyOn(runner, 'runSingleSequence').mockImplementation(async (tasks) => tasks[0].result);
   });
 
   it('Successfully export zip', async () => {
     const app = await build({
+      plugin,
       taskManager,
       runner,
     });
 
-    jest.spyOn(taskManager, 'createGetTask').mockImplementation((member, itemId) => {
-      if (ITEM_FOLDER.id === itemId) return new MockTask(ITEM_FOLDER);
-      SUB_ITEMS.forEach((item) => {
-        if (item.id === itemId) return new MockTask(item);
-      });
-      return new MockTask(null);
+    const parentItem = ITEM_FOLDER;
+    const subItems = SUB_ITEMS;
+
+    mockCreateGetTaskSequence({
+      itemTaskManager: taskManager,
+      parentItem,
+      subItems,
     });
-    const createGetChildrenTask = jest
-      .spyOn(taskManager, 'createGetChildrenTaskSequence')
-      .mockImplementation((member, itemId) => {
-        if (ITEM_FOLDER.id === itemId) return [new MockTask(SUB_ITEMS)];
-        else return [new MockTask([])];
-      });
+    const createGetChildrenTask = mockCreateGetChildrenTaskSequence({
+      itemTaskManager: taskManager,
+      parentItem,
+      subItems,
+    });
 
     const res = await app.inject({
       method: 'GET',
@@ -202,19 +206,21 @@ describe('Export Zip', () => {
 
   it('Throw if file not found', async () => {
     const app = await build({
+      plugin,
       taskManager,
       runner,
     });
 
-    const getFileTask = new MockTask(null);
-    jest.spyOn(taskManager, 'createGetTask').mockImplementation(() => getFileTask);
+    jest
+      .spyOn(taskManager, 'createGetTaskSequence')
+      .mockImplementation(() => [new MockTask(NON_EXISTING_FILE)]);
     const fileTaskManager = new FileTaskManager(
       DEFAULT_OPTIONS.serviceOptions,
       ServiceMethod.LOCAL,
     );
 
     jest.spyOn(fileTaskManager, 'createDownloadFileTask').mockImplementation(() => {
-      return getFileTask;
+      throw Error('file not found');
     });
 
     const res = await app.inject({

@@ -1306,8 +1306,8 @@ __metadata:
 
 "@types/graasp@github:graasp/graasp-types":
   version: 0.1.0
-  resolution: "@types/graasp@https://github.com/graasp/graasp-types.git#commit=6ecd2dd55c9f49381e6ba1c9106af1acf192f78e"
-  checksum: 4118d146c2fa5d6df21985d2ef0e180a9c206c2a6b3bc8e9934594e3f0df08a9d3d67dd9906a8217475f66423c0dca069b6f9e7b5d2c0c7a615f4c9c6b1b320b
+  resolution: "@types/graasp@https://github.com/graasp/graasp-types.git#commit=f928605803d55ce7b51d87f9c915d2390ff029be"
+  checksum: 8fc2a6239b030bb4bed1d582525b474eb58597bd2da6a76abc026d23c4a03925983e50cb5da8bf5e31869d0009f154f6a6c6ee6df31a95a8e5722931d0f0cca4
   languageName: node
   linkType: hard
 
@@ -3294,6 +3294,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fastify-cors@npm:^6.0.2":
+  version: 6.0.3
+  resolution: "fastify-cors@npm:6.0.3"
+  dependencies:
+    fastify-plugin: ^3.0.0
+    vary: ^1.1.2
+  checksum: 054cf4e1cf0b20778ac24d9995a99f44e9b026ca9a028db0cbb6093922bcc931dff5f5bb185d19e881014392bb5886a8b5f9da6af3d3ab5e62b7a68f4eca33c4
+  languageName: node
+  linkType: hard
+
 "fastify-error@npm:^0.3.0":
   version: 0.3.1
   resolution: "fastify-error@npm:0.3.1"
@@ -3742,6 +3752,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graasp-item-tags@github:graasp/graasp-item-tags":
+  version: 0.1.0
+  resolution: "graasp-item-tags@https://github.com/graasp/graasp-item-tags.git#commit=fab30bc3e195ad1c156ea90754584988426f8a75"
+  dependencies:
+    http-status-codes: 2.2.0
+  checksum: 6b3093f6f5776c96e8a19f2dd712a5f35eec2ce4d20c5a9b89f1855842f0b79c5804cdd9637a81a690af216afc36419b51c357b408adb44d51454b45b63966ef
+  languageName: node
+  linkType: hard
+
 "graasp-plugin-file-item@github:graasp/graasp-plugin-file-item":
   version: 0.1.0
   resolution: "graasp-plugin-file-item@https://github.com/graasp/graasp-plugin-file-item.git#commit=d5fbd6d4408215e46db085030361ad42eefe73b1"
@@ -3754,26 +3773,14 @@ __metadata:
 
 "graasp-plugin-file@github:graasp/graasp-plugin-file":
   version: 0.1.0
-  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=0f1a3a7972c5aaa129aaec99fa1cc57532a8d7f0"
-  dependencies:
-    aws-sdk: 2.1074.0
-    content-disposition: 0.5.4
-    fastify-multipart: 5.3.1
-    http-status-codes: 2.2.0
-  checksum: 12055eea9f21d99f28b0625bfd1a8c76a64b5b176341b376a6b4bf657550aa01ba6b25925cf1fb6b01eec5ca1c9c91120d02870d7798e09ee75bc57234765e85
-  languageName: node
-  linkType: hard
-
-"graasp-plugin-file@github:graasp/graasp-plugin-file#11/returnFile":
-  version: 0.1.0
-  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=03f2e9021a634a16803248f30136b81e1c0335c3"
+  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=15b14acae21bd56e5081e0346660f81c546f42be"
   dependencies:
     aws-sdk: 2.1074.0
     content-disposition: 0.5.4
     fastify-multipart: 5.3.1
     http-status-codes: 2.2.0
     node-fetch: 2
-  checksum: aec520276cbf359140bfd503ea743c1759b7232e7a4136c1dcd91813b74009531384ad64e30cca14db79148d0e74459d15b7254b4b6dccbea0f4ded61a3ceb9b
+  checksum: cbffa25ceab4b20e88b9ca82f0df8cfdd5f76cd929ee14a60e4fbf4611fece63ebd800dfe3767036a7d56617e1e5e1108b76c10265ff9011e6324c2ba99590b5
   languageName: node
   linkType: hard
 
@@ -3801,8 +3808,9 @@ __metadata:
     extract-zip: 2.0.1
     fastify: 3.25.3
     fastify-multipart: 5.2.1
-    graasp-plugin-file: "github:graasp/graasp-plugin-file#11/returnFile"
+    graasp-plugin-file: "github:graasp/graasp-plugin-file"
     graasp-plugin-file-item: "github:graasp/graasp-plugin-file-item"
+    graasp-plugin-public: "github:graasp/graasp-plugin-public"
     graasp-test: "github:graasp/graasp-test"
     http-status-codes: ^2.2.0
     husky: 7.0.4
@@ -3820,6 +3828,18 @@ __metadata:
     uuid: 8.3.2
   languageName: unknown
   linkType: soft
+
+"graasp-plugin-public@github:graasp/graasp-plugin-public":
+  version: 0.1.0
+  resolution: "graasp-plugin-public@https://github.com/graasp/graasp-plugin-public.git#commit=690102927a2c7cf78335a0cab633fa2fac9131a3"
+  dependencies:
+    fastify-cors: ^6.0.2
+    graasp-item-tags: "github:graasp/graasp-item-tags"
+    http-status-codes: ^2.2.0
+    qs: ^6.10.2
+  checksum: 5393af38efe2d0f89709310797a4a20e4aa002e289bef01ebb2f03e845d2c5dcb7d4181d9eeb6ff2c42079cb8ea8b48c8101425dfad05664c47f0fae18b40d95
+  languageName: node
+  linkType: hard
 
 "graasp-test@github:graasp/graasp-test":
   version: 0.1.0
@@ -7515,6 +7535,13 @@ __metadata:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
+  languageName: node
+  linkType: hard
+
+"vary@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "vary@npm:1.1.2"
+  checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
   languageName: node
   linkType: hard
 

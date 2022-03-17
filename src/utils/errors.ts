@@ -19,7 +19,7 @@ export class GraaspImportZipError implements GraaspError {
   }
 }
 
-export class FileIsNotAValidArchiveError extends GraaspImportZipError {
+export class FileIsInvalidArchiveError extends GraaspImportZipError {
   constructor(data?: unknown) {
     super(
       {
@@ -39,6 +39,19 @@ export class InvalidArchiveStructureError extends GraaspImportZipError {
         code: 'GPIZERR002',
         statusCode: StatusCodes.BAD_REQUEST,
         message: 'Zip structure is invalid',
+      },
+      data,
+    );
+  }
+}
+
+export class InvalidFileItemError extends GraaspImportZipError {
+  constructor(data?: unknown) {
+    super(
+      {
+        code: 'GPIZERR003',
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: 'File properties are invalid.',
       },
       data,
     );
