@@ -204,35 +204,6 @@ describe('Export Zip', () => {
     );
   });
 
-  // TODO
-  it('Item not found on unexisting item', async () => {
-    const app = await build({
-      plugin,
-      taskManager,
-      runner,
-    });
-
-    jest
-      .spyOn(taskManager, 'createGetTaskSequence')
-      .mockImplementation(() => [new MockTask(NON_EXISTING_FILE)]);
-    const fileTaskManager = new FileTaskManager(
-      DEFAULT_OPTIONS.serviceOptions,
-      ServiceMethod.LOCAL,
-    );
-
-    jest.spyOn(fileTaskManager, 'createDownloadFileTask').mockImplementation(() => {
-      throw Error('file not found');
-    });
-
-    const res = await app.inject({
-      method: 'GET',
-      url: `/zip-export/${NON_EXISTING_FILE.id}`,
-      headers: new FormData().getHeaders(),
-    });
-
-    expect(false).toBeTruthy();
-  });
-
   it('Throw if file not found', async () => {
     const app = await build({
       plugin,

@@ -33,8 +33,8 @@ export const mockCreateGetChildrenTask = ({
 }) => {
   return jest
     .spyOn(itemTaskManager, 'createGetChildrenTask')
-    .mockImplementation((_member, { itemId }) => {
-      if (parentItem?.id === itemId) return new MockTask(subItems);
+    .mockImplementation((_member, { item }) => {
+      if (parentItem?.id === item.id) return new MockTask(subItems);
       else return new MockTask([]);
     });
 };

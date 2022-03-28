@@ -279,6 +279,8 @@ export const addItemToZip = async (args: {
   }
 };
 
+export const buildStoragePath = (itemId) => path.join(__dirname, TMP_FOLDER_PATH, itemId);
+
 export const prepareArchiveFromItem = async ({
   item,
   log,
@@ -301,7 +303,7 @@ export const prepareArchiveFromItem = async ({
   });
 
   // path to save files temporarly and save archive
-  const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, item.id);
+  const fileStorage = buildStoragePath(item.id);
   await mkdir(fileStorage, { recursive: true });
   const zipPath = path.join(fileStorage, item.id + '.zip');
   const zipStream = fs.createWriteStream(zipPath);

@@ -3811,7 +3811,7 @@ __metadata:
     graasp-plugin-file: "github:graasp/graasp-plugin-file"
     graasp-plugin-file-item: "github:graasp/graasp-plugin-file-item"
     graasp-plugin-public: "github:graasp/graasp-plugin-public"
-    graasp-test: "github:graasp/graasp-test"
+    graasp-test: "github:graasp/graasp-test#19/getChildrenTaskInput"
     http-status-codes: ^2.2.0
     husky: 7.0.4
     jest: ^27.4.7
@@ -3841,10 +3841,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graasp-test@github:graasp/graasp-test":
+"graasp-test@github:graasp/graasp-test#19/getChildrenTaskInput":
   version: 0.1.0
-  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=c37d9977ea3d3de72a0c5ac16f8e4084cc2e690c"
-  checksum: 1c9f476969a9b16e07c35c4a44ea4e91fc6a58e37831db746e7744e701502a3e6b917d988121e7442e452bd934100e9714502c46a4a70a2580ac765c9fefd0ca
+  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=64215edb2de9057ecdc060c57a3112eeacf41ad4"
+  checksum: beb1f1d47220da1b656fb1adb915bd1de2523f12df45a7187b9ec5d442f8e71722e5c3f160b29b2d5289690ccfdedfee53cb8ceb14aa1e1638e77b12efe608a9
   languageName: node
   linkType: hard
 

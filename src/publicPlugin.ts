@@ -1,13 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
 import fs, { ReadStream } from 'fs';
-import path from 'path';
 import { Item } from 'graasp';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
 import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
-import { TMP_FOLDER_PATH } from './constants';
 import { zipExport } from './schemas/schema';
-import { prepareArchiveFromItem } from './utils/utils';
+import { buildStoragePath, prepareArchiveFromItem } from './utils/utils';
 import { DownloadFileFunction, GetChildrenFromItemFunction, GraaspPluginZipOptions } from './types';
 
 const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, options) => {
@@ -73,11 +71,15 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         downloadFile,
       });
     },
-    onResponse: async (request) => {
+    onResponse: async ({ params, log }) => {
       // delete tmp files after endpoint responded
-      const itemId = (request?.params as { itemId: string })?.itemId as string;
-      const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
-      fs.rmSync(fileStorage, { recursive: true });
+      const itemId = (params as { itemId: string })?.itemId as string;
+      const fileStorage = buildStoragePath(itemId);
+      if (fs.existsSync(fileStorage)) {
+        fs.rmSync(fileStorage, { recursive: true });
+      } else {
+        log?.error(`${fileStorage} was not found,  and was not deleted`);
+      }
     },
   });
 };

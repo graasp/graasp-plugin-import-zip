@@ -61,7 +61,7 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-standard": "^4.0.1",
     "fastify": "3.25.3",
-    "graasp-test": "github:graasp/graasp-test",
+    "graasp-test": "github:graasp/graasp-test#19/getChildrenTaskInput",
     "husky": "7.0.4",
     "jest": "^27.4.7",
     "prettier": "^2.5.1",
