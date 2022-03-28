@@ -261,7 +261,7 @@ export const addItemToZip = async (args: {
         });
       }
       // eslint-disable-next-line no-case-declarations
-      subItems = await getChildrenFromItem({ itemId: item.id });
+      subItems = await getChildrenFromItem({ item });
       await Promise.all(
         subItems.map((subItem) =>
           addItemToZip({

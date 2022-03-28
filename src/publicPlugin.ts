@@ -16,6 +16,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     taskRunner: runner,
     public: {
       items: { taskManager: publicTaskManager },
+      graaspActor,
     },
   } = fastify;
 
@@ -35,14 +36,15 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     method: 'GET',
     url: '/zip-export/:itemId',
     schema: zipExport,
-    handler: async ({ member, params: { itemId }, log }, reply) => {
+    handler: async ({ params: { itemId }, log }, reply) => {
+      const member = graaspActor;
       // get item info
       const getItemTask = publicTaskManager.createGetPublicItemTask(member, { itemId });
       const item = (await runner.runSingle(getItemTask)) as Item;
 
       // no need to verify public attribute, as it is verified when getting the parent item
-      const getChildrenFromItem: GetChildrenFromItemFunction = async ({ itemId }) =>
-        runner.runSingle(iTM.createGetChildrenTask(member, { itemId }));
+      const getChildrenFromItem: GetChildrenFromItemFunction = async ({ item }) =>
+        runner.runSingle(iTM.createGetChildrenTask(member, { item }));
 
       const downloadFile: DownloadFileFunction = async ({
         filepath,

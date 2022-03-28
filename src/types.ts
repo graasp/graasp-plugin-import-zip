@@ -36,7 +36,7 @@ export type Extra = {
   };
 };
 
-export type GetChildrenFromItemFunction = ({ itemId }: { itemId: string }) => Promise<Item[]>;
+export type GetChildrenFromItemFunction = ({ item }: { item: Item }) => Promise<Item[]>;
 
 export type DownloadFileFunction = (args: {
   filepath: string;

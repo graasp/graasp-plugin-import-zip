@@ -197,9 +197,9 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const getItemTasks = iTM.createGetTaskSequence(member, itemId);
       const item = (await runner.runSingleSequence(getItemTasks)) as Item;
 
-      const getChildrenFromItem: GetChildrenFromItemFunction = async ({ itemId }) => {
+      const getChildrenFromItem: GetChildrenFromItemFunction = async ({ item }) => {
         const items = await runner.runSingleSequence(
-          iTM.createGetChildrenTaskSequence(member, itemId, true),
+          iTM.createGetChildrenTaskSequence(member, item.id, true),
         );
         return items as Item[];
       };

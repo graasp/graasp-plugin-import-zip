@@ -1304,10 +1304,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/graasp@github:graasp/graasp-types":
+"@types/graasp@github:graasp/graasp-types#16/getChildrenTaskInput":
   version: 0.1.0
-  resolution: "@types/graasp@https://github.com/graasp/graasp-types.git#commit=f928605803d55ce7b51d87f9c915d2390ff029be"
-  checksum: 8fc2a6239b030bb4bed1d582525b474eb58597bd2da6a76abc026d23c4a03925983e50cb5da8bf5e31869d0009f154f6a6c6ee6df31a95a8e5722931d0f0cca4
+  resolution: "@types/graasp@https://github.com/graasp/graasp-types.git#commit=de30027e13b056f94872bd5ddaeaa40eec569ebd"
+  checksum: cabc5781ead8f3e9a2a1849b815ac0b4df7795fa871aec9efbc27a3d26119338819533301cccaa51ff87b74eb74a0d2a5595b18e840a6314eaf6698150722843
   languageName: node
   linkType: hard
 
@@ -3792,7 +3792,7 @@ __metadata:
     "@commitlint/config-conventional": 16.0.0
     "@types/archiver": 5.3.1
     "@types/eslint": ^8.2.1
-    "@types/graasp": "github:graasp/graasp-types"
+    "@types/graasp": "github:graasp/graasp-types#16/getChildrenTaskInput"
     "@types/jest": ^27.4.0
     "@types/node": 17.0.8
     "@types/uuid": 8.3.4
