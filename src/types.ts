@@ -1,10 +1,12 @@
+import { ReadStream } from 'fs';
+import { Item } from 'graasp';
 import {
   GraaspLocalFileItemOptions,
   GraaspS3FileItemOptions,
   ServiceMethod,
 } from 'graasp-plugin-file';
 
-export interface GraaspImportZipPluginOptions {
+export interface GraaspPluginZipOptions {
   pathPrefix: string;
   serviceMethod: ServiceMethod;
   serviceOptions: { s3: GraaspS3FileItemOptions; local: GraaspLocalFileItemOptions };
@@ -33,3 +35,12 @@ export type Extra = {
     settings;
   };
 };
+
+export type GetChildrenFromItemFunction = ({ item }: { item: Item }) => Promise<Item[]>;
+
+export type DownloadFileFunction = (args: {
+  filepath: string;
+  itemId: string;
+  mimetype: string;
+  fileStorage: string;
+}) => Promise<ReadStream>;

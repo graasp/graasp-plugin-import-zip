@@ -1,14 +1,16 @@
-import fastify, { FastifyInstance } from 'fastify';
-import plugin from '../src/service-api';
+import fastify, { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { TaskRunner, ItemTaskManager } from 'graasp-test';
 import schemas from '../src/schemas/common';
 import { ServiceMethod } from 'graasp-plugin-file';
-import { GraaspImportZipPluginOptions } from '../src/types';
+import { GraaspPluginZipOptions } from '../src/types';
+import { PublicItemTaskManager } from 'graasp-plugin-public';
 
 type props = {
   taskManager: ItemTaskManager;
   runner: TaskRunner;
-  options?: GraaspImportZipPluginOptions;
+  options?: GraaspPluginZipOptions;
+  plugin: FastifyPluginAsync<GraaspPluginZipOptions>;
+  publicItemTaskManager?: PublicItemTaskManager;
 };
 
 export const DEFAULT_OPTIONS = {
@@ -27,12 +29,22 @@ export const DEFAULT_OPTIONS = {
   },
 };
 
-const build = async ({ taskManager, runner }: props): Promise<FastifyInstance> => {
+const build = async ({
+  plugin,
+  taskManager,
+  publicItemTaskManager,
+  runner,
+}: props): Promise<FastifyInstance> => {
   const app = fastify();
   app.addSchema(schemas);
   app.decorate('taskRunner', runner);
   app.decorate('items', {
     taskManager,
+  });
+  app.decorate('public', {
+    items: {
+      taskManager: publicItemTaskManager,
+    },
   });
 
   await app.register(plugin, DEFAULT_OPTIONS);

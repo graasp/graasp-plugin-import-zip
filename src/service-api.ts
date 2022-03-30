@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import extract from 'extract-zip';
-import fs from 'fs';
+import fs, { ReadStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { v4 } from 'uuid';
 import path from 'path';
@@ -14,22 +14,23 @@ import { DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from './constants';
 import { zipExport, zipImport } from './schemas/schema';
 import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import {
-  addItemToZip,
   checkHasZipStructure,
   generateItemFromFilename,
   handleItemDescription,
+  prepareArchiveFromItem,
 } from './utils/utils';
 import {
-  GraaspImportZipPluginOptions,
+  DownloadFileFunction,
+  GetChildrenFromItemFunction,
+  GraaspPluginZipOptions,
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from './types';
-import { FileIsNotAValidArchiveError } from './utils/errors';
-import archiver from 'archiver';
+import { FileIsInvalidArchiveError } from './utils/errors';
 
 const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
 
-const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify, options) => {
+const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, options) => {
   const {
     items: { taskManager: iTM },
     taskRunner: runner,
@@ -129,7 +130,7 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
 
       // throw if file is not a zip
       if (zipFile.mimetype !== 'application/zip') {
-        throw new FileIsNotAValidArchiveError();
+        throw new FileIsInvalidArchiveError();
       }
 
       const uploadFile: UploadFileFunction = async ({ filepath, mimetype }) => {
@@ -193,65 +194,43 @@ const plugin: FastifyPluginAsync<GraaspImportZipPluginOptions> = async (fastify,
     schema: zipExport,
     handler: async ({ member, params: { itemId }, log }, reply) => {
       // get item info
-      const getItemTask = iTM.createGetTask(member, itemId);
-      const item = await runner.runSingle(getItemTask);
+      const getItemTasks = iTM.createGetTaskSequence(member, itemId);
+      const item = (await runner.runSingleSequence(getItemTasks)) as Item;
 
-      // init archive
-      const archive = archiver.create('zip', { store: true });
-      archive.on('warning', function (err) {
-        if (err.code === 'ENOENT') {
-          log.debug(err);
-        } else {
-          throw err;
-        }
-      });
-      archive.on('error', function (err) {
-        throw err;
-      });
+      const getChildrenFromItem: GetChildrenFromItemFunction = async ({ item }) => {
+        console.log('woijefgheirjkgw----');
+        const items = await runner.runSingleSequence(
+          iTM.createGetChildrenTaskSequence(member, item.id, true),
+        );
+        return items as Item[];
+      };
 
-      // path to save files temporarly and save archive
-      const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, item.id);
-      await mkdir(fileStorage, { recursive: true });
-      const zipPath = path.join(fileStorage, item.id + '.zip');
-      const zipStream = fs.createWriteStream(zipPath);
-      archive.pipe(zipStream);
-
-      // path used to index files in archive
-      const rootPath = path.dirname('./');
-
-      // create files from items
-      try {
-        await addItemToZip({
-          item,
-          archiveRootPath: rootPath,
-          archive,
-          member,
-          fileServiceType: SERVICE_ITEM_TYPE,
-          iTM,
-          runner,
-          fileTaskManager: fTM,
+      const downloadFile: DownloadFileFunction = async ({
+        filepath,
+        itemId,
+        mimetype,
+        fileStorage,
+      }) => {
+        const task = fTM.createDownloadFileTask(member, {
+          filepath,
+          itemId,
+          mimetype,
           fileStorage,
         });
-      } catch (error) {
-        throw new Error(`Error during exporting zip: ${error}`);
-      }
 
-      // wait for zip to be completely created
-      const sendBufferPromise = new Promise((resolve, reject) => {
-        zipStream.on('error', reject);
+        // if file not found, an error will be thrown by this line
+        const fileStream = (await runner.runSingle(task)) as ReadStream;
+        return fileStream;
+      };
 
-        zipStream.on('close', () => {
-          // set reply headers depending zip file and return file
-          const buffer = fs.readFileSync(zipPath);
-          reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
-          reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
-          reply.type('application/zip');
-          resolve(buffer);
-        });
+      return prepareArchiveFromItem({
+        item,
+        log,
+        reply,
+        fileServiceType: SERVICE_ITEM_TYPE,
+        getChildrenFromItem,
+        downloadFile,
       });
-
-      archive.finalize();
-      return sendBufferPromise;
     },
     onResponse: async (request) => {
       // delete tmp files after endpoint responded

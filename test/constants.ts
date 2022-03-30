@@ -1,3 +1,4 @@
+import { Item } from 'graasp';
 import { v4 } from 'uuid';
 import { ItemType } from '../src/constants';
 
@@ -49,12 +50,18 @@ export const ITEM_S3 = {
     },
   },
 };
-export const SUB_ITEMS = [
+export const SUB_ITEMS: Item[] = [
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130004',
     name: 'public_item1',
     path: 'ecafbd2a_5688_11eb_ae93_0242ac130002.fdf09f5a_5688_11eb_ae93_0242ac130004',
     type: ItemType.FOLDER,
+    createdAt: 'createdAt',
+    creator: 'Louise',
+    updatedAt: 'updatedAt',
+    description: '',
+    extra: {},
+    settings: {},
   },
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130003',
@@ -66,6 +73,11 @@ export const SUB_ITEMS = [
         content: '',
       },
     },
+    createdAt: 'createdAt',
+    creator: 'Louise',
+    updatedAt: 'updatedAt',
+    description: '',
+    settings: {},
   },
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130002',
@@ -77,6 +89,11 @@ export const SUB_ITEMS = [
         url: '',
       },
     },
+    createdAt: 'createdAt',
+    creator: 'Louise',
+    updatedAt: 'updatedAt',
+    description: '',
+    settings: {},
   },
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130001',
@@ -88,12 +105,28 @@ export const SUB_ITEMS = [
         url: '',
       },
     },
+    createdAt: 'createdAt',
+    creator: 'Louise',
+    updatedAt: 'updatedAt',
+    description: '',
+    settings: {},
   },
 ];
 
-export const NON_EXISTING_FILE = {
+export const NON_EXISTING_FILE: Item = {
   id: v4(),
   name: 'not_existing_item',
   path: 'path',
   type: ItemType.LOCALFILE,
+  createdAt: 'createdAt',
+  creator: 'Louise',
+  updatedAt: 'updatedAt',
+  description: '',
+  extra: {
+    [ItemType.LOCALFILE]: {
+      path: 'path',
+      mimetype: 'mimetype',
+    },
+  },
+  settings: {},
 };

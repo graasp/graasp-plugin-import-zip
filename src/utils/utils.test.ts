@@ -1,7 +1,12 @@
 import path from 'path';
 import { FastifyLoggerInstance } from 'fastify';
 import fs, { createReadStream } from 'fs';
+import { Item } from 'graasp';
+import { TaskRunner } from 'graasp-test';
+import archiver from 'archiver';
 import { readFile } from 'fs/promises';
+import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
+import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import {
   FOLDER_PATH,
   FOLDER_NAME,
@@ -14,14 +19,9 @@ import {
 } from '../../test/fixtures/utils/fixtureUtils';
 import { addItemToZip, generateItemFromFilename, handleItemDescription } from './utils';
 import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
-import { Item } from 'graasp';
-import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import MockTask from 'graasp-test/src/tasks/task';
 import { DEFAULT_OPTIONS } from '../../test/app';
 import { FIXTURE_IMAGE_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
-import { TaskRunner } from 'graasp-test';
-import archiver from 'archiver';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
 const DEFAULT_PARENT_ID = 'parentId';
@@ -330,12 +330,10 @@ describe('Utils', () => {
         item: ITEM_LOCAL,
         archiveRootPath: '',
         archive: archiverMock,
-        member: null,
         fileServiceType: FILE_ITEM_TYPES.LOCAL,
-        iTM: null,
-        runner: runner,
-        fileTaskManager: localFileTaskManager,
         fileStorage: '',
+        getChildrenFromItem: jest.fn(),
+        downloadFile: jest.fn(),
       });
     });
 
@@ -354,12 +352,10 @@ describe('Utils', () => {
         item: ITEM_S3,
         archiveRootPath: '',
         archive: archiverMock,
-        member: null,
         fileServiceType: FILE_ITEM_TYPES.S3,
-        iTM: null,
-        runner: runner,
-        fileTaskManager: S3FileTaskManager,
         fileStorage: '',
+        getChildrenFromItem: jest.fn(),
+        downloadFile: jest.fn(),
       });
     });
   });

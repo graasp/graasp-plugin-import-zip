@@ -1,2 +1,3 @@
 export { default } from './service-api';
-export { GraaspImportZipPluginOptions } from './types';
+export { default as publicPlugin } from './publicPlugin';
+export { GraaspPluginZipOptions } from './types';

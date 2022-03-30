@@ -1,17 +1,23 @@
 import { FastifyLoggerInstance } from 'fastify';
-import { Item, ItemTaskManager, TaskRunner, Member, Actor } from 'graasp';
-import fs, { ReadStream } from 'fs';
+import { Item } from 'graasp';
+import fs from 'fs';
 import path from 'path';
-import { readFile } from 'fs/promises';
-import mime from 'mime-types';
-import { FILE_ITEM_TYPES, ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
-import type { Extra, UpdateParentDescriptionFunction, UploadFileFunction } from '../types';
+import { mkdir, readFile } from 'fs/promises';
 import util from 'util';
 import mmm from 'mmmagic';
-import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
-import { InvalidArchiveStructureError } from './errors';
-import { Archiver } from 'archiver';
-import { FileTaskManager, LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
+import mime from 'mime-types';
+import archiver, { Archiver } from 'archiver';
+import { FILE_ITEM_TYPES, ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+import { LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
+import type {
+  DownloadFileFunction,
+  Extra,
+  GetChildrenFromItemFunction,
+  UpdateParentDescriptionFunction,
+  UploadFileFunction,
+} from '../types';
+import { buildSettings, DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from '../constants';
+import { InvalidArchiveStructureError, InvalidFileItemError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
 const asyncDetectFile = util.promisify(magic.detectFile.bind(magic));
@@ -169,23 +175,19 @@ export const addItemToZip = async (args: {
   item: Item;
   archiveRootPath: string;
   archive: Archiver;
-  member: Member;
   fileServiceType: string;
-  iTM: ItemTaskManager;
-  runner: TaskRunner<Actor>;
-  fileTaskManager: FileTaskManager;
   fileStorage: string;
+  getChildrenFromItem: GetChildrenFromItemFunction;
+  downloadFile: DownloadFileFunction;
 }) => {
   const {
     item,
     archiveRootPath,
     archive,
-    member,
     fileServiceType,
-    iTM,
-    runner,
     fileStorage,
-    fileTaskManager,
+    getChildrenFromItem,
+    downloadFile,
   } = args;
   // get item and its related data
   const itemExtra = item.extra as Extra;
@@ -197,25 +199,29 @@ export const addItemToZip = async (args: {
       let mimetype = '';
       // check for service type and assign filepath, mimetype respectively
       if (fileServiceType === FILE_ITEM_TYPES.S3) {
-        const s3Extra = item.extra as S3FileItemExtra;
-        ({ path: filepath, mimetype } = s3Extra.s3File);
+        const s3Extra = item?.extra as S3FileItemExtra;
+        filepath = s3Extra?.s3File?.path;
+        mimetype = s3Extra?.s3File?.mimetype;
       } else if (fileServiceType === FILE_ITEM_TYPES.LOCAL) {
         const fileExtra = item.extra as LocalFileItemExtra;
-        ({ path: filepath, mimetype } = fileExtra.file);
+        filepath = fileExtra?.file?.path;
+        mimetype = fileExtra?.file?.mimetype;
       } else {
         // throw if service type is neither
         console.error(`fileServiceType invalid: ${fileServiceType}`);
       }
-      // get file stream
-      const task = fileTaskManager.createDownloadFileTask(member, {
+
+      if (!filepath || !mimetype) {
+        throw new InvalidFileItemError(item);
+      }
+
+      const fileStream = await downloadFile({
         filepath,
         itemId: item.id,
         mimetype,
         fileStorage,
       });
 
-      // if file not found, an error will be thrown by this line
-      const fileStream = (await runner.runSingle(task)) as ReadStream;
       // build filename with extension if does not exist
       let ext = path.extname(item.name);
       if (!ext) {
@@ -255,24 +261,86 @@ export const addItemToZip = async (args: {
         });
       }
       // eslint-disable-next-line no-case-declarations
-      subItems = await runner.runSingleSequence(
-        iTM.createGetChildrenTaskSequence(member, item.id, true),
-      );
+      subItems = await getChildrenFromItem({ item });
       await Promise.all(
         subItems.map((subItem) =>
           addItemToZip({
             item: subItem,
             archiveRootPath: folderPath,
             archive,
-            member,
             fileServiceType,
-            iTM,
-            runner,
-            fileTaskManager,
             fileStorage,
+            getChildrenFromItem,
+            downloadFile,
           }),
         ),
       );
     }
   }
+};
+
+export const buildStoragePath = (itemId) => path.join(__dirname, TMP_FOLDER_PATH, itemId);
+
+export const prepareArchiveFromItem = async ({
+  item,
+  log,
+  fileServiceType,
+  reply,
+  getChildrenFromItem,
+  downloadFile,
+}) => {
+  // init archive
+  const archive = archiver.create('zip', { store: true });
+  archive.on('warning', function (err) {
+    if (err.code === 'ENOENT') {
+      log.debug(err);
+    } else {
+      throw err;
+    }
+  });
+  archive.on('error', function (err) {
+    throw err;
+  });
+
+  // path to save files temporarly and save archive
+  const fileStorage = buildStoragePath(item.id);
+  await mkdir(fileStorage, { recursive: true });
+  const zipPath = path.join(fileStorage, item.id + '.zip');
+  const zipStream = fs.createWriteStream(zipPath);
+  archive.pipe(zipStream);
+
+  // path used to index files in archive
+  const rootPath = path.dirname('./');
+
+  // create files from items
+  try {
+    await addItemToZip({
+      item,
+      archiveRootPath: rootPath,
+      archive,
+      fileServiceType,
+      fileStorage,
+      getChildrenFromItem,
+      downloadFile,
+    });
+  } catch (error) {
+    throw new Error(`Error during exporting zip: ${error}`);
+  }
+
+  // wait for zip to be completely created
+  const sendBufferPromise = new Promise((resolve, reject) => {
+    zipStream.on('error', reject);
+
+    zipStream.on('close', () => {
+      // set reply headers depending zip file and return file
+      const buffer = fs.readFileSync(zipPath);
+      reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
+      reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
+      reply.type('application/zip');
+      resolve(buffer);
+    });
+  });
+
+  archive.finalize();
+  return sendBufferPromise;
 };
