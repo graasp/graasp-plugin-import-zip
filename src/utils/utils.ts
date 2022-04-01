@@ -134,6 +134,7 @@ export const handleItemDescription = async (options: {
 
   // parent folder description
   if (filename === `${folderName}${DESCRIPTION_EXTENTION}`) {
+    console.log(filename)
     await updateParentDescription({ parentId, content });
   }
   // links description
@@ -144,18 +145,29 @@ export const handleItemDescription = async (options: {
       item.description = content;
 
     } else {
-      console.error(`Cannot find item ${name}`)
+      console.error(`Cannot find item with name ${name}`)
     }
   }
-  // files description
-  else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
-    const name = filename.slice(0, -(DESCRIPTION_EXTENTION.length + 1))
-    const item = items.find(({ name: thisName }) => name === thisName.split('.')[0]);
+  // documents description
+  else if (filename.endsWith(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
+    const name = filename.slice(0, -(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`.length))
+    const item = items.find(({ name: thisName }) => name === thisName);
     if (item) {
       item.description = content;
 
     } else {
-      console.error(`Cannot find item ${name}`)
+      console.error(`Cannot find item with name ${name}`)
+    }
+  }
+  // files and folders description
+  else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
+    const name = filename.slice(0, -(DESCRIPTION_EXTENTION.length))
+    const item = items.find(({ name: thisName }) => name === thisName);
+    if (item) {
+      item.description = content;
+
+    } else {
+      console.error(`Cannot find item with name ${name}`)
     }
   } else {
     console.error(`${filepath} is not handled`);
