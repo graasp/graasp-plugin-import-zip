@@ -16,3 +16,8 @@ export enum ItemType {
 export const buildSettings = (hasThumbnail) => ({
   hasThumbnail,
 });
+
+export const GRAASP_DOCUMENT_EXTENSION = '.graasp'
+export const LINK_EXTENSION = '.url'
+
+export const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
