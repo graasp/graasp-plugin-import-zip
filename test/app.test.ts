@@ -138,7 +138,7 @@ describe('Import Zip', () => {
 
       // recursively handle zip content
       expect(createItemTask).toHaveBeenCalledTimes(1 + FIXTURES_DOT_CHILDREN_ITEMS.length);
-      expect(res.json()[0].name).toEqual(FIXTURE_DOT_PARENT_ITEM.name)
+      expect(res.json()[0].name).toEqual(FIXTURE_DOT_PARENT_ITEM.name);
     });
 
     it('Successfully import zip in parent', async () => {

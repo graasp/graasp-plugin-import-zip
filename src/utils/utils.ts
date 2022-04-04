@@ -16,7 +16,14 @@ import type {
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
-import { buildSettings, DESCRIPTION_EXTENTION, GRAASP_DOCUMENT_EXTENSION, ItemType, LINK_EXTENSION, TMP_FOLDER_PATH } from '../constants';
+import {
+  buildSettings,
+  DESCRIPTION_EXTENTION,
+  GRAASP_DOCUMENT_EXTENSION,
+  ItemType,
+  LINK_EXTENSION,
+  TMP_FOLDER_PATH,
+} from '../constants';
 import { InvalidArchiveStructureError, InvalidFileItemError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
@@ -67,7 +74,7 @@ export const generateItemFromFilename = async (options: {
     const type = linkType.includes('1') ? ItemType.APP : ItemType.LINK;
 
     return {
-      name: filename.slice(0, -(LINK_EXTENSION.length)),
+      name: filename.slice(0, -LINK_EXTENSION.length),
       type,
       extra: {
         [type]: {
@@ -80,7 +87,7 @@ export const generateItemFromFilename = async (options: {
   else if (filename.endsWith(GRAASP_DOCUMENT_EXTENSION)) {
     return {
       // remove .graasp from name
-      name: filename.slice(0, -(GRAASP_DOCUMENT_EXTENSION.length)),
+      name: filename.slice(0, -GRAASP_DOCUMENT_EXTENSION.length),
       type: ItemType.DOCUMENT,
       extra: {
         [ItemType.DOCUMENT]: {
@@ -134,40 +141,36 @@ export const handleItemDescription = async (options: {
 
   // parent folder description
   if (filename === `${folderName}${DESCRIPTION_EXTENTION}`) {
-    console.log(filename)
     await updateParentDescription({ parentId, content });
   }
   // links description
   else if (filename.endsWith(`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
-    const name = filename.slice(0, -(`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`.length))
+    const name = filename.slice(0, -`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`.length);
     const item = items.find(({ name: thisName }) => name === thisName);
     if (item) {
       item.description = content;
-
     } else {
-      console.error(`Cannot find item with name ${name}`)
+      console.error(`Cannot find item with name ${name}`);
     }
   }
   // documents description
   else if (filename.endsWith(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
-    const name = filename.slice(0, -(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`.length))
+    const name = filename.slice(0, -`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`.length);
     const item = items.find(({ name: thisName }) => name === thisName);
     if (item) {
       item.description = content;
-
     } else {
-      console.error(`Cannot find item with name ${name}`)
+      console.error(`Cannot find item with name ${name}`);
     }
   }
   // files and folders description
   else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
-    const name = filename.slice(0, -(DESCRIPTION_EXTENTION.length))
+    const name = filename.slice(0, -DESCRIPTION_EXTENTION.length);
     const item = items.find(({ name: thisName }) => name === thisName);
     if (item) {
       item.description = content;
-
     } else {
-      console.error(`Cannot find item with name ${name}`)
+      console.error(`Cannot find item with name ${name}`);
     }
   } else {
     console.error(`${filepath} is not handled`);

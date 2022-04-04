@@ -17,7 +17,13 @@ export const buildSettings = (hasThumbnail) => ({
   hasThumbnail,
 });
 
-export const GRAASP_DOCUMENT_EXTENSION = '.graasp'
-export const LINK_EXTENSION = '.url'
+export const GRAASP_DOCUMENT_EXTENSION = '.graasp';
+export const LINK_EXTENSION = '.url';
 
 export const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
+
+export const ZIP_FILE_MIME_TYPES = [
+  'application/zip',
+  'application/x-zip-compressed',
+  'multipart/x-zip',
+];
