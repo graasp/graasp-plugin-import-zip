@@ -133,7 +133,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const zipFile = await request.file();
 
       // throw if file is not a zip
-      if (ZIP_FILE_MIME_TYPES.includes(zipFile.mimetype)) {
+      if (!ZIP_FILE_MIME_TYPES.includes(zipFile.mimetype)) {
         throw new FileIsInvalidArchiveError(zipFile.mimetype);
       }
 
