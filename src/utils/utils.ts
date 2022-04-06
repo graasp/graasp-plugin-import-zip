@@ -122,6 +122,16 @@ export const generateItemFromFilename = async (options: {
   }
 };
 
+const setDescriptionInItem = ({ filename, content, items, extention }) => {
+  const name = filename.slice(0, -extention.length);
+  const item = items.find(({ name: thisName }) => name === thisName);
+  if (item) {
+    item.description = content;
+  } else {
+    console.error(`Cannot find item with name ${name}`);
+  }
+};
+
 export const handleItemDescription = async (options: {
   filename: string;
   filepath: string;
@@ -145,33 +155,25 @@ export const handleItemDescription = async (options: {
   }
   // links description
   else if (filename.endsWith(`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
-    const name = filename.slice(0, -`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`.length);
-    const item = items.find(({ name: thisName }) => name === thisName);
-    if (item) {
-      item.description = content;
-    } else {
-      console.error(`Cannot find item with name ${name}`);
-    }
+    setDescriptionInItem({
+      filename,
+      content,
+      items,
+      extention: `${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`,
+    });
   }
   // documents description
   else if (filename.endsWith(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
-    const name = filename.slice(0, -`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`.length);
-    const item = items.find(({ name: thisName }) => name === thisName);
-    if (item) {
-      item.description = content;
-    } else {
-      console.error(`Cannot find item with name ${name}`);
-    }
+    setDescriptionInItem({
+      filename,
+      content,
+      items,
+      extention: `${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`,
+    });
   }
   // files and folders description
   else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
-    const name = filename.slice(0, -DESCRIPTION_EXTENTION.length);
-    const item = items.find(({ name: thisName }) => name === thisName);
-    if (item) {
-      item.description = content;
-    } else {
-      console.error(`Cannot find item with name ${name}`);
-    }
+    setDescriptionInItem({ filename, content, items, extention: DESCRIPTION_EXTENTION });
   } else {
     console.error(`${filepath} is not handled`);
   }
