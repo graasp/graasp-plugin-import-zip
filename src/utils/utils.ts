@@ -17,12 +17,14 @@ import type {
   UploadFileFunction,
 } from '../types';
 import {
+  APP_URL_PREFIX,
   buildSettings,
   DESCRIPTION_EXTENTION,
   GRAASP_DOCUMENT_EXTENSION,
   ItemType,
   LINK_EXTENSION,
   TMP_FOLDER_PATH,
+  URL_PREFIX,
 } from '../constants';
 import { InvalidArchiveStructureError, InvalidFileItemError } from './errors';
 
@@ -68,7 +70,7 @@ export const generateItemFromFilename = async (options: {
     const [_source, link, linkType] = content.split('\n');
 
     // get url from content
-    const url = link.slice('URL='.length);
+    const url = link.slice(URL_PREFIX.length);
 
     // get if app in content -> url is either a link or an app
     const type = linkType.includes('1') ? ItemType.APP : ItemType.LINK;
@@ -192,9 +194,9 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
 // build the file content in case of Link/App
 export const buildTextContent = (url: string, type: ItemType): string => {
   if (type === ItemType.LINK) {
-    return `[InternetShortcut]\n${url}\n`;
+    return `[InternetShortcut]\n${URL_PREFIX}${url}\n`;
   }
-  return `[InternetShortcut]\n${url}\nAppURL=1\n`;
+  return `[InternetShortcut]\n${URL_PREFIX}${url}\n${APP_URL_PREFIX}1\n`;
 };
 
 export const addItemToZip = async (args: {
