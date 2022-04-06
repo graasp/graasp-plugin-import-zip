@@ -26,7 +26,7 @@ import {
   TMP_FOLDER_PATH,
   URL_PREFIX,
 } from '../constants';
-import { InvalidArchiveStructureError, InvalidFileItemError } from './errors';
+import { InvalidFileItemError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
 const asyncDetectFile = util.promisify(magic.detectFile.bind(magic));
@@ -179,16 +179,6 @@ export const handleItemDescription = async (options: {
   } else {
     console.error(`${filepath} is not handled`);
   }
-};
-
-export const checkHasZipStructure = async (contentPath: string): Promise<boolean> => {
-  // content has only one root
-  const children = fs.readdirSync(contentPath);
-  if (children.length !== 1) {
-    throw new InvalidArchiveStructureError();
-  }
-
-  return true;
 };
 
 // build the file content in case of Link/App

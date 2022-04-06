@@ -20,7 +20,6 @@ import {
 import { zipExport, zipImport } from './schemas/schema';
 import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import {
-  checkHasZipStructure,
   generateItemFromFilename,
   handleItemDescription,
   prepareArchiveFromItem,
@@ -171,9 +170,6 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       await pipeline(Readable.from(await zipFile.toBuffer()), fs.createWriteStream(zipPath));
 
       await extract(zipPath, { dir: contentFolder });
-
-      // check zip has graasp structure <- might delete this to accept any zip
-      await checkHasZipStructure(contentFolder);
 
       const items = await createItemsFromFolderContent({
         member,
