@@ -16,7 +16,16 @@ import type {
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
-import { buildSettings, DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from '../constants';
+import {
+  APP_URL_PREFIX,
+  buildSettings,
+  DESCRIPTION_EXTENTION,
+  GRAASP_DOCUMENT_EXTENSION,
+  ItemType,
+  LINK_EXTENSION,
+  TMP_FOLDER_PATH,
+  URL_PREFIX,
+} from '../constants';
 import { InvalidArchiveStructureError, InvalidFileItemError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
@@ -30,11 +39,9 @@ export const generateItemFromFilename = async (options: {
   uploadFile: UploadFileFunction;
 }): Promise<Partial<Item> | null> => {
   const { filename, uploadFile, fileServiceType, folderPath } = options;
-  // bug: what if has dot in name?
-  const name = filename.split('.')[0];
 
   // ignore hidden files such as .DS_STORE
-  if (!name) {
+  if (filename.startsWith('.')) {
     return null;
   }
 
@@ -45,7 +52,7 @@ export const generateItemFromFilename = async (options: {
   if (stats.isDirectory()) {
     // element has no extension -> folder
     return {
-      name,
+      name: filename,
       type: ItemType.FOLDER,
     };
   }
@@ -58,18 +65,18 @@ export const generateItemFromFilename = async (options: {
   });
 
   // links and apps
-  if (filename.endsWith('.url')) {
+  if (filename.endsWith(LINK_EXTENSION)) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_source, link, linkType] = content.split('\n');
 
     // get url from content
-    const url = link.slice('URL='.length);
+    const url = link.slice(URL_PREFIX.length);
 
     // get if app in content -> url is either a link or an app
     const type = linkType.includes('1') ? ItemType.APP : ItemType.LINK;
 
     return {
-      name,
+      name: filename.slice(0, -LINK_EXTENSION.length),
       type,
       extra: {
         [type]: {
@@ -79,9 +86,10 @@ export const generateItemFromFilename = async (options: {
     };
   }
   // documents
-  else if (filename.endsWith('.graasp')) {
+  else if (filename.endsWith(GRAASP_DOCUMENT_EXTENSION)) {
     return {
-      name,
+      // remove .graasp from name
+      name: filename.slice(0, -GRAASP_DOCUMENT_EXTENSION.length),
       type: ItemType.DOCUMENT,
       extra: {
         [ItemType.DOCUMENT]: {
@@ -116,6 +124,16 @@ export const generateItemFromFilename = async (options: {
   }
 };
 
+const setDescriptionInItem = ({ filename, content, items, extention }) => {
+  const name = filename.slice(0, -extention.length);
+  const item = items.find(({ name: thisName }) => name === thisName);
+  if (item) {
+    item.description = content;
+  } else {
+    console.error(`Cannot find item with name ${name}`);
+  }
+};
+
 export const handleItemDescription = async (options: {
   filename: string;
   filepath: string;
@@ -125,8 +143,6 @@ export const handleItemDescription = async (options: {
   updateParentDescription: UpdateParentDescriptionFunction;
 }): Promise<void> => {
   const { filename, items, filepath, parentId, folderName, updateParentDescription } = options;
-
-  const name = filename.split('.')[0];
 
   // string content
   // todo: optimize to avoid reading the file twice in case of upload
@@ -140,14 +156,26 @@ export const handleItemDescription = async (options: {
     await updateParentDescription({ parentId, content });
   }
   // links description
-  else if (filename.endsWith(`.url${DESCRIPTION_EXTENTION}`)) {
-    const item = items.find(({ name: thisName }) => name === thisName);
-    item.description = content;
+  else if (filename.endsWith(`${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
+    setDescriptionInItem({
+      filename,
+      content,
+      items,
+      extention: `${LINK_EXTENSION}${DESCRIPTION_EXTENTION}`,
+    });
   }
-  // files description
+  // documents description
+  else if (filename.endsWith(`${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`)) {
+    setDescriptionInItem({
+      filename,
+      content,
+      items,
+      extention: `${GRAASP_DOCUMENT_EXTENSION}${DESCRIPTION_EXTENTION}`,
+    });
+  }
+  // files and folders description
   else if (filename.endsWith(DESCRIPTION_EXTENTION)) {
-    const item = items.find(({ name: thisName }) => name === thisName.split('.')[0]);
-    item.description = content;
+    setDescriptionInItem({ filename, content, items, extention: DESCRIPTION_EXTENTION });
   } else {
     console.error(`${filepath} is not handled`);
   }
@@ -166,9 +194,9 @@ export const checkHasZipStructure = async (contentPath: string): Promise<boolean
 // build the file content in case of Link/App
 export const buildTextContent = (url: string, type: ItemType): string => {
   if (type === ItemType.LINK) {
-    return `[InternetShortcut]\n${url}\n`;
+    return `[InternetShortcut]\n${URL_PREFIX}${url}\n`;
   }
-  return `[InternetShortcut]\n${url}\nAppURL=1\n`;
+  return `[InternetShortcut]\n${URL_PREFIX}${url}\n${APP_URL_PREFIX}1\n`;
 };
 
 export const addItemToZip = async (args: {
@@ -239,17 +267,17 @@ export const addItemToZip = async (args: {
     }
     case ItemType.DOCUMENT:
       archive.append(itemExtra.document?.content, {
-        name: path.join(archiveRootPath, `${item.name}.graasp`),
+        name: path.join(archiveRootPath, `${item.name}${GRAASP_DOCUMENT_EXTENSION}`),
       });
       break;
     case ItemType.LINK:
       archive.append(buildTextContent(itemExtra.embeddedLink?.url, ItemType.LINK), {
-        name: path.join(archiveRootPath, `${item.name}.url`),
+        name: path.join(archiveRootPath, `${item.name}${LINK_EXTENSION}`),
       });
       break;
     case ItemType.APP:
       archive.append(buildTextContent(itemExtra.app?.url, ItemType.APP), {
-        name: path.join(archiveRootPath, `${item.name}.url`),
+        name: path.join(archiveRootPath, `${item.name}${LINK_EXTENSION}`),
       });
       break;
     case ItemType.FOLDER: {
@@ -257,7 +285,7 @@ export const addItemToZip = async (args: {
       const folderPath = path.join(archiveRootPath, item.name);
       if (item.description) {
         archive.append(item.description, {
-          name: path.join(folderPath, `${item.name}.description.html`),
+          name: path.join(folderPath, `${item.name}${DESCRIPTION_EXTENTION}`),
         });
       }
       // eslint-disable-next-line no-case-declarations

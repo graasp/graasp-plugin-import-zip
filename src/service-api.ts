@@ -10,7 +10,13 @@ import { pipeline } from 'stream/promises';
 import { readFile } from 'fs/promises';
 import fastifyMultipart from 'fastify-multipart';
 import { Item } from 'graasp';
-import { DESCRIPTION_EXTENTION, ItemType, TMP_FOLDER_PATH } from './constants';
+import {
+  DESCRIPTION_EXTENTION,
+  ItemType,
+  TMP_FOLDER_PATH,
+  DEFAULT_MAX_FILE_SIZE,
+  ZIP_FILE_MIME_TYPES,
+} from './constants';
 import { zipExport, zipImport } from './schemas/schema';
 import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import {
@@ -27,8 +33,6 @@ import {
   UploadFileFunction,
 } from './types';
 import { FileIsInvalidArchiveError } from './utils/errors';
-
-const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
 
 const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, options) => {
   const {
@@ -129,8 +133,8 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const zipFile = await request.file();
 
       // throw if file is not a zip
-      if (zipFile.mimetype !== 'application/zip') {
-        throw new FileIsInvalidArchiveError();
+      if (!ZIP_FILE_MIME_TYPES.includes(zipFile.mimetype)) {
+        throw new FileIsInvalidArchiveError(zipFile.mimetype);
       }
 
       const uploadFile: UploadFileFunction = async ({ filepath, mimetype }) => {
@@ -198,7 +202,6 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const item = (await runner.runSingleSequence(getItemTasks)) as Item;
 
       const getChildrenFromItem: GetChildrenFromItemFunction = async ({ item }) => {
-        console.log('woijefgheirjkgw----');
         const items = await runner.runSingleSequence(
           iTM.createGetChildrenTaskSequence(member, item.id, true),
         );

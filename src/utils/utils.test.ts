@@ -235,7 +235,7 @@ describe('Utils', () => {
     it('Image', async () => {
       const name = `${IMAGE_NAME}.png`;
       const filename = `${name}${DESCRIPTION_EXTENTION}`;
-      const items: Partial<Item>[] = [{ name: IMAGE_NAME, type: DEFAULT_FILE_SERVICE_TYPE }];
+      const items: Partial<Item>[] = [{ name, type: DEFAULT_FILE_SERVICE_TYPE }];
 
       await handleItemDescription({
         filename,

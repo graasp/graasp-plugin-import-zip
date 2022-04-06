@@ -5,6 +5,7 @@ import { ItemTaskManager, TaskRunner } from 'graasp-test';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
 import {
+  FIXTURE_DOT_ZIP_PATH,
   FIXTURE_IMAGE_PATH,
   FIXTURE_LIGHT_COLOR_ZIP_PATH,
   ITEM_FOLDER,
@@ -23,6 +24,7 @@ import {
   mockCreateGetTaskSequence,
   mockRunSingle,
 } from './mocks';
+import { FIXTURES_DOT_CHILDREN_ITEMS, FIXTURE_DOT_PARENT_ITEM } from './fixtures/07.03.2022';
 
 const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();
@@ -33,21 +35,22 @@ describe('Import Zip', () => {
 
     jest.spyOn(runner, 'runSingle').mockImplementation(async () => true);
     jest.spyOn(runner, 'runSingleSequence').mockImplementation(async () => true);
-    jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
-      // first level
-      if (tasks.length === 3) {
-        return FIXTURES_MOCK_CHILDREN_ITEMS;
-      }
-      // parent level
-      if (tasks.length === 1) {
-        return [LIGHT_COLOR_PARENT_ITEM];
-      }
-      return [];
-    });
   });
 
   describe('/zip-import', () => {
-    it('Successfully import zip', async () => {
+    it('Successfully import zip light color', async () => {
+      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
+        // first level
+        if (tasks.length === 3) {
+          return FIXTURES_MOCK_CHILDREN_ITEMS;
+        }
+        // parent level
+        if (tasks.length === 1) {
+          return [LIGHT_COLOR_PARENT_ITEM];
+        }
+        return [];
+      });
+
       const app = await build({
         plugin,
         taskManager,
@@ -61,7 +64,6 @@ describe('Import Zip', () => {
 
       const form = new FormData();
       const filepath = path.resolve(__dirname, FIXTURE_LIGHT_COLOR_ZIP_PATH);
-      form.append('file', createReadStream(filepath));
       form.append('file', createReadStream(filepath));
 
       const res = await app.inject({
@@ -87,7 +89,71 @@ describe('Import Zip', () => {
       expect(createItemTask).toHaveBeenCalledTimes(1 + FIXTURES_MOCK_CHILDREN_ITEMS.length);
     });
 
+    it('Successfully import zip with dot in name', async () => {
+      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
+        // first level
+        if (tasks.length === 3) {
+          return FIXTURES_DOT_CHILDREN_ITEMS;
+        }
+        // parent level
+        if (tasks.length === 1) {
+          return [FIXTURE_DOT_PARENT_ITEM];
+        }
+        return [];
+      });
+
+      const app = await build({
+        plugin,
+        taskManager,
+        runner,
+      });
+
+      const createItemTask = jest
+        .spyOn(taskManager, 'createCreateTaskSequence')
+        .mockReturnValue([new MockTask(true)]);
+      jest.spyOn(taskManager, 'createUpdateTaskSequence').mockReturnValue([new MockTask(true)]);
+
+      const form = new FormData();
+      const filepath = path.resolve(__dirname, FIXTURE_DOT_ZIP_PATH);
+      form.append('file', createReadStream(filepath));
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/zip-import',
+        payload: form,
+        headers: form.getHeaders(),
+      });
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      // file is deleted
+      try {
+        if (existsSync(TMP_FOLDER_PATH)) {
+          // file is deleted
+          const files = readdirSync(TMP_FOLDER_PATH);
+          expect(files.length).toBeFalsy();
+        }
+      } catch (err) {
+        // don't check if folder doesn't exist
+      }
+
+      // recursively handle zip content
+      expect(createItemTask).toHaveBeenCalledTimes(1 + FIXTURES_DOT_CHILDREN_ITEMS.length);
+      expect(res.json()[0].name).toEqual(FIXTURE_DOT_PARENT_ITEM.name);
+    });
+
     it('Successfully import zip in parent', async () => {
+      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
+        // first level
+        if (tasks.length === 3) {
+          return FIXTURES_MOCK_CHILDREN_ITEMS;
+        }
+        // parent level
+        if (tasks.length === 1) {
+          return [LIGHT_COLOR_PARENT_ITEM];
+        }
+        return [];
+      });
+
       const app = await build({
         plugin,
         taskManager,
