@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import extract from 'extract-zip';
-import fs, { ReadStream } from 'fs';
+import fs, { createReadStream, ReadStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { v4 } from 'uuid';
 import path from 'path';
@@ -18,7 +18,7 @@ import {
   ZIP_FILE_MIME_TYPES,
 } from './constants';
 import { zipExport, zipImport } from './schemas/schema';
-import { buildFilePathFromPrefix, FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
+import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
 import {
   generateItemFromFilename,
   handleItemDescription,
@@ -40,9 +40,6 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
   } = fastify;
 
   const { serviceMethod, serviceOptions, pathPrefix } = options;
-
-  const SERVICE_ITEM_TYPE =
-    serviceMethod === ServiceMethod.S3 ? FILE_ITEM_TYPES.S3 : FILE_ITEM_TYPES.LOCAL;
 
   const fTM = new FileTaskManager(serviceOptions, serviceMethod);
 
@@ -87,7 +84,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       // add new item
       else {
         const item = await generateItemFromFilename({
-          fileServiceType: SERVICE_ITEM_TYPE,
+          fileServiceType: serviceMethod,
           uploadFile,
           filename,
           folderPath,
@@ -142,9 +139,10 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         const buffer = await readFile(filepath);
         const uploadFilePath = buildFilePathFromPrefix(pathPrefix);
         const uploadTask = fTM.createUploadFileTask(member, {
-          file: buffer,
+          file: createReadStream(filepath),
           filepath: uploadFilePath,
           mimetype,
+          size: fs.statSync(filepath).size
         });
         await runner.runSingle(uploadTask);
         return uploadFilePath;
@@ -226,7 +224,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         item,
         log,
         reply,
-        fileServiceType: SERVICE_ITEM_TYPE,
+        fileServiceType: serviceMethod,
         getChildrenFromItem,
         downloadFile,
       });

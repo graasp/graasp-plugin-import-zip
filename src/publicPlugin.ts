@@ -3,7 +3,6 @@ import fs, { ReadStream } from 'fs';
 import { Item } from 'graasp';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
-import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import { zipExport } from './schemas/schema';
 import { buildStoragePath, prepareArchiveFromItem } from './utils/utils';
 import { DownloadFileFunction, GetChildrenFromItemFunction, GraaspPluginZipOptions } from './types';
@@ -23,9 +22,6 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
   }
 
   const { serviceMethod, serviceOptions } = options;
-
-  const SERVICE_ITEM_TYPE =
-    serviceMethod === ServiceMethod.S3 ? FILE_ITEM_TYPES.S3 : FILE_ITEM_TYPES.LOCAL;
 
   const fTM = new FileTaskManager(serviceOptions, serviceMethod);
 
@@ -66,7 +62,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         item,
         log,
         reply,
-        fileServiceType: SERVICE_ITEM_TYPE,
+        fileServiceType: serviceMethod,
         getChildrenFromItem,
         downloadFile,
       });
