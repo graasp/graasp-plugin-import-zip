@@ -229,11 +229,15 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         downloadFile,
       });
     },
-    onResponse: async (request) => {
+    onResponse: async ({ params, log }) => {
       // delete tmp files after endpoint responded
-      const itemId = (request?.params as { itemId: string })?.itemId as string;
+      const itemId = (params as { itemId: string })?.itemId as string;
       const fileStorage = path.join(__dirname, TMP_FOLDER_PATH, itemId);
-      fs.rmSync(fileStorage, { recursive: true });
+      if (fs.existsSync(fileStorage)) {
+        fs.rmSync(fileStorage, { recursive: true });
+      } else {
+        log?.error(`${fileStorage} was not found, and was not deleted`);
+      }
     },
   });
 };

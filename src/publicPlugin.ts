@@ -74,7 +74,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       if (fs.existsSync(fileStorage)) {
         fs.rmSync(fileStorage, { recursive: true });
       } else {
-        log?.error(`${fileStorage} was not found,  and was not deleted`);
+        log?.error(`${fileStorage} was not found, and was not deleted`);
       }
     },
   });
