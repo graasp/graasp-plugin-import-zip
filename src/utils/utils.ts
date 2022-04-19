@@ -7,8 +7,8 @@ import util from 'util';
 import mmm from 'mmmagic';
 import mime from 'mime-types';
 import archiver, { Archiver } from 'archiver';
-import { FILE_ITEM_TYPES, ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
-import { LocalFileItemExtra, S3FileItemExtra } from 'graasp-plugin-file';
+import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+import { LocalFileItemExtra, S3FileItemExtra, ServiceMethod } from 'graasp-plugin-file';
 import type {
   DownloadFileFunction,
   Extra,
@@ -216,11 +216,11 @@ export const addItemToZip = async (args: {
       let filepath = '';
       let mimetype = '';
       // check for service type and assign filepath, mimetype respectively
-      if (fileServiceType === FILE_ITEM_TYPES.S3) {
+      if (fileServiceType === ServiceMethod.S3) {
         const s3Extra = item?.extra as S3FileItemExtra;
         filepath = s3Extra?.s3File?.path;
         mimetype = s3Extra?.s3File?.mimetype;
-      } else if (fileServiceType === FILE_ITEM_TYPES.LOCAL) {
+      } else if (fileServiceType === ServiceMethod.LOCAL) {
         const fileExtra = item.extra as LocalFileItemExtra;
         filepath = fileExtra?.file?.path;
         mimetype = fileExtra?.file?.mimetype;

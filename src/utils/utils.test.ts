@@ -5,7 +5,6 @@ import { Item } from 'graasp';
 import { TaskRunner } from 'graasp-test';
 import archiver from 'archiver';
 import { readFile } from 'fs/promises';
-import { FILE_ITEM_TYPES } from 'graasp-plugin-file-item';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
 import {
   FOLDER_PATH,
@@ -330,7 +329,7 @@ describe('Utils', () => {
         item: ITEM_LOCAL,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: FILE_ITEM_TYPES.LOCAL,
+        fileServiceType: ServiceMethod.LOCAL,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
@@ -352,7 +351,7 @@ describe('Utils', () => {
         item: ITEM_S3,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: FILE_ITEM_TYPES.S3,
+        fileServiceType: ServiceMethod.S3,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
