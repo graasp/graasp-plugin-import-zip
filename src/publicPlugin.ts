@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import fs, { ReadStream } from 'fs';
 import { Item } from 'graasp';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { FileTaskManager } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
 import { zipExport } from './schemas/schema';
 import { buildStoragePath, prepareArchiveFromItem } from './utils/utils';

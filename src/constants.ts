@@ -28,5 +28,5 @@ export const ZIP_FILE_MIME_TYPES = [
   'multipart/x-zip',
 ];
 
-export const URL_PREFIX = 'URL='
-export const APP_URL_PREFIX = 'AppURL='
+export const URL_PREFIX = 'URL=';
+export const APP_URL_PREFIX = 'AppURL=';

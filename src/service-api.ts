@@ -4,10 +4,9 @@ import fs, { createReadStream, ReadStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import { v4 } from 'uuid';
 import path from 'path';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { FileTaskManager } from 'graasp-plugin-file';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import { readFile } from 'fs/promises';
 import fastifyMultipart from 'fastify-multipart';
 import { Item } from 'graasp';
 import {
@@ -136,13 +135,12 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const uploadFile: UploadFileFunction = async ({ filepath, mimetype }) => {
         log.debug(`upload ${filepath}`);
 
-        const buffer = await readFile(filepath);
         const uploadFilePath = buildFilePathFromPrefix(pathPrefix);
         const uploadTask = fTM.createUploadFileTask(member, {
           file: createReadStream(filepath),
           filepath: uploadFilePath,
           mimetype,
-          size: fs.statSync(filepath).size
+          size: fs.statSync(filepath).size,
         });
         await runner.runSingle(uploadTask);
         return uploadFilePath;

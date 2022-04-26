@@ -1,5 +1,5 @@
 {
-  "name": "graasp-plugin-import-zip",
+  "name": "graasp-plugin-item-zip",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
