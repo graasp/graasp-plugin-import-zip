@@ -163,7 +163,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const contentFolder = path.join(targetFolder, 'content');
 
       // save graasp zip
-      await pipeline(Readable.from(await zipFile.toBuffer()), fs.createWriteStream(zipPath));
+      await pipeline(zipFile.file, fs.createWriteStream(zipPath));
 
       await extract(zipPath, { dir: contentFolder });
 
