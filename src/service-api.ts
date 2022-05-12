@@ -1,28 +1,25 @@
-import { FastifyPluginAsync } from 'fastify';
 import extract from 'extract-zip';
-import fs, { createReadStream, ReadStream } from 'fs';
+import fs, { ReadStream, createReadStream } from 'fs';
 import { mkdir } from 'fs/promises';
-import { v4 } from 'uuid';
 import path from 'path';
-import { FileTaskManager } from 'graasp-plugin-file';
-import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import fastifyMultipart from 'fastify-multipart';
+import { v4 } from 'uuid';
+
+import fastifyMultipart from '@fastify/multipart';
+import { FastifyPluginAsync } from 'fastify';
+
 import { Item } from 'graasp';
+import { FileTaskManager } from 'graasp-plugin-file';
+import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
+
 import {
+  DEFAULT_MAX_FILE_SIZE,
   DESCRIPTION_EXTENTION,
   ItemType,
   TMP_FOLDER_PATH,
-  DEFAULT_MAX_FILE_SIZE,
   ZIP_FILE_MIME_TYPES,
 } from './constants';
 import { zipExport, zipImport } from './schemas/schema';
-import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
-import {
-  generateItemFromFilename,
-  handleItemDescription,
-  prepareArchiveFromItem,
-} from './utils/utils';
 import {
   DownloadFileFunction,
   GetChildrenFromItemFunction,
@@ -31,6 +28,11 @@ import {
   UploadFileFunction,
 } from './types';
 import { FileIsInvalidArchiveError } from './utils/errors';
+import {
+  generateItemFromFilename,
+  handleItemDescription,
+  prepareArchiveFromItem,
+} from './utils/utils';
 
 const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, options) => {
   const {

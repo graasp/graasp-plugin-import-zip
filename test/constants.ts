@@ -1,5 +1,7 @@
-import { Item } from 'graasp';
 import { v4 } from 'uuid';
+
+import { Item } from 'graasp';
+
 import { ItemType } from '../src/constants';
 
 export const FIXTURE_LIGHT_COLOR_ZIP_PATH = './fixtures/lightColor.zip';

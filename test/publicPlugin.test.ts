@@ -1,15 +1,17 @@
 import FormData from 'form-data';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
 import { StatusCodes } from 'http-status-codes';
-import { ITEM_FOLDER, NON_EXISTING_FILE, SUB_ITEMS } from './constants';
-import build, { DEFAULT_OPTIONS } from './app';
-import MockTask from 'graasp-test/src/tasks/task';
+
+import { Item } from 'graasp';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
-import { ItemType } from '../src/constants';
-import plugin from '../src/publicPlugin';
 import { PublicItemTaskManager } from 'graasp-plugin-public';
 import { BasePublicItemTask } from 'graasp-plugin-public/dist/services/item/tasks/base-public-item-task';
-import { Item } from 'graasp';
+import { ItemTaskManager, TaskRunner } from 'graasp-test';
+import MockTask from 'graasp-test/src/tasks/task';
+
+import { ItemType } from '../src/constants';
+import plugin from '../src/publicPlugin';
+import build, { DEFAULT_OPTIONS } from './app';
+import { ITEM_FOLDER, NON_EXISTING_FILE, SUB_ITEMS } from './constants';
 import { mockCreateGetChildrenTask, mockCreateGetTaskSequence, mockRunSingle } from './mocks';
 
 const taskManager = new ItemTaskManager();
