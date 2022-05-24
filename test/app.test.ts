@@ -1,9 +1,16 @@
-import { readdirSync, createReadStream, existsSync } from 'fs';
 import FormData from 'form-data';
-import { v4 } from 'uuid';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
+import { createReadStream, existsSync, readdirSync } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
+import { v4 } from 'uuid';
+
+import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { ItemTaskManager, TaskRunner } from 'graasp-test';
+import MockTask from 'graasp-test/src/tasks/task';
+
+import { ItemType } from '../src/constants';
+import plugin from '../src/service-api';
+import build, { DEFAULT_OPTIONS } from './app';
 import {
   FIXTURE_DOT_ZIP_PATH,
   FIXTURE_IMAGE_PATH,
@@ -13,18 +20,13 @@ import {
   SUB_ITEMS,
   TMP_FOLDER_PATH,
 } from './constants';
-import build, { DEFAULT_OPTIONS } from './app';
-import MockTask from 'graasp-test/src/tasks/task';
+import { FIXTURES_DOT_CHILDREN_ITEMS, FIXTURE_DOT_PARENT_ITEM } from './fixtures/07.03.2022';
 import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixtures/lightColor';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
-import { ItemType } from '../src/constants';
-import plugin from '../src/service-api';
 import {
   mockCreateGetChildrenTaskSequence,
   mockCreateGetTaskSequence,
   mockRunSingle,
 } from './mocks';
-import { FIXTURES_DOT_CHILDREN_ITEMS, FIXTURE_DOT_PARENT_ITEM } from './fixtures/07.03.2022';
 
 const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();

@@ -1,26 +1,29 @@
-import path from 'path';
-import { FastifyLoggerInstance } from 'fastify';
-import fs, { createReadStream } from 'fs';
-import { Item } from 'graasp';
-import { TaskRunner } from 'graasp-test';
 import archiver from 'archiver';
+import fs, { createReadStream } from 'fs';
 import { readFile } from 'fs/promises';
+import path from 'path';
+
+import { FastifyLoggerInstance } from 'fastify';
+
+import { Item } from 'graasp';
 import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
-import {
-  FOLDER_PATH,
-  FOLDER_NAME,
-  DEFAULT_FOLDER_NAME,
-  APP_NAME,
-  IMAGE_NAME,
-  LINK_NAME,
-  DOCUMENT_NAME,
-  IMAGE_NAME_WITHOUT_EXTENSION,
-} from '../../test/fixtures/utils/fixtureUtils';
-import { addItemToZip, generateItemFromFilename, handleItemDescription } from './utils';
-import { buildSettings, DESCRIPTION_EXTENTION, ItemType } from '../constants';
+import { TaskRunner } from 'graasp-test';
 import MockTask from 'graasp-test/src/tasks/task';
+
 import { DEFAULT_OPTIONS } from '../../test/app';
 import { FIXTURE_IMAGE_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
+import {
+  APP_NAME,
+  DEFAULT_FOLDER_NAME,
+  DOCUMENT_NAME,
+  FOLDER_NAME,
+  FOLDER_PATH,
+  IMAGE_NAME,
+  IMAGE_NAME_WITHOUT_EXTENSION,
+  LINK_NAME,
+} from '../../test/fixtures/utils/fixtureUtils';
+import { DESCRIPTION_EXTENTION, ItemType, buildSettings } from '../constants';
+import { addItemToZip, generateItemFromFilename, handleItemDescription } from './utils';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
 const DEFAULT_PARENT_ID = 'parentId';

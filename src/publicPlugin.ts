@@ -1,11 +1,14 @@
-import { FastifyPluginAsync } from 'fastify';
 import fs, { ReadStream } from 'fs';
+
+import { FastifyPluginAsync } from 'fastify';
+
 import { Item } from 'graasp';
 import { FileTaskManager } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
+
 import { zipExport } from './schemas/schema';
-import { buildStoragePath, prepareArchiveFromItem } from './utils/utils';
 import { DownloadFileFunction, GetChildrenFromItemFunction, GraaspPluginZipOptions } from './types';
+import { buildStoragePath, prepareArchiveFromItem } from './utils/utils';
 
 const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, options) => {
   const {

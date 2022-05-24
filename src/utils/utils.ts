@@ -1,14 +1,27 @@
-import { FastifyLoggerInstance } from 'fastify';
-import { Item } from 'graasp';
-import fs from 'fs';
-import path from 'path';
-import { mkdir, readFile } from 'fs/promises';
-import util from 'util';
-import mmm from 'mmmagic';
-import mime from 'mime-types';
 import archiver, { Archiver } from 'archiver';
-import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+import fs from 'fs';
+import { mkdir, readFile } from 'fs/promises';
+import mime from 'mime-types';
+import mmm from 'mmmagic';
+import path from 'path';
+import util from 'util';
+
+import { FastifyLoggerInstance } from 'fastify';
+
+import { Item } from 'graasp';
 import { LocalFileItemExtra, S3FileItemExtra, ServiceMethod } from 'graasp-plugin-file';
+import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
+
+import {
+  APP_URL_PREFIX,
+  DESCRIPTION_EXTENTION,
+  GRAASP_DOCUMENT_EXTENSION,
+  ItemType,
+  LINK_EXTENSION,
+  TMP_FOLDER_PATH,
+  URL_PREFIX,
+  buildSettings,
+} from '../constants';
 import type {
   DownloadFileFunction,
   Extra,
@@ -16,16 +29,6 @@ import type {
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
-import {
-  APP_URL_PREFIX,
-  buildSettings,
-  DESCRIPTION_EXTENTION,
-  GRAASP_DOCUMENT_EXTENSION,
-  ItemType,
-  LINK_EXTENSION,
-  TMP_FOLDER_PATH,
-  URL_PREFIX,
-} from '../constants';
 import { InvalidFileItemError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);

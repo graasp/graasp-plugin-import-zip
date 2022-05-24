@@ -1,9 +1,11 @@
 import fastify, { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { TaskRunner, ItemTaskManager } from 'graasp-test';
-import schemas from '../src/schemas/common';
+
 import { ServiceMethod } from 'graasp-plugin-file';
-import { GraaspPluginZipOptions } from '../src/types';
 import { PublicItemTaskManager } from 'graasp-plugin-public';
+import { ItemTaskManager, TaskRunner } from 'graasp-test';
+
+import schemas from '../src/schemas/common';
+import { GraaspPluginZipOptions } from '../src/types';
 
 type props = {
   taskManager: ItemTaskManager;
