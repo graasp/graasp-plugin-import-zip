@@ -108,16 +108,7 @@ export const generateItemFromFilename = async (options: {
     const { size } = stats;
 
     // upload file
-    let uploadFilePath = null;
-    try {
-      uploadFilePath = await uploadFile({ mimetype, filepath });
-    } catch (e) {
-      // ignore file upload error
-      // continue the process despite one file failure
-      // the file might be empty and we want to ignore the file
-      // todo: send sentry error if unexpected error
-      return null;
-    }
+    const uploadFilePath = await uploadFile({ mimetype, filepath });
 
     // create file item
     return {

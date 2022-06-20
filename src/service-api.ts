@@ -9,7 +9,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { FastifyPluginAsync } from 'fastify';
 
 import { Item } from 'graasp';
-import { FileTaskManager } from 'graasp-plugin-file';
+import { FileTaskManager, UploadEmptyFileError } from 'graasp-plugin-file';
 import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
 
 import {
@@ -84,20 +84,30 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       }
       // add new item
       else {
-        const item = await generateItemFromFilename({
-          fileServiceType: serviceMethod,
-          uploadFile,
-          filename,
-          folderPath,
-          log,
-        });
-        item && items.push(item);
+        try {
+          const item = await generateItemFromFilename({
+            fileServiceType: serviceMethod,
+            uploadFile,
+            filename,
+            folderPath,
+            log,
+          });
+          items.push(item);
+        } catch (e) {
+          if (e instanceof UploadEmptyFileError) {
+            // ignore empty files
+          } else {
+            // improvement: return a list of failed imports
+            throw e;
+          }
+        }
       }
     }
 
     // create the items
     const tasks = items.map((item) => iTM.createCreateTaskSequence(member, item, parentId));
     const newItems = (await runner.runMultipleSequences(tasks)) as Item[];
+    console.log('newItems: ', newItems);
 
     // recursively create children in folders
     for (const { type, name, id } of newItems) {
