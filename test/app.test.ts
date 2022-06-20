@@ -228,7 +228,7 @@ describe('Import Zip', () => {
         headers: form.getHeaders(),
       });
 
-      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('Ignore empty files in archive', async () => {
@@ -268,7 +268,7 @@ describe('Import Zip', () => {
       expect(res.statusCode).toBe(StatusCodes.OK);
     });
 
-    it('Throw on if one file fails to upload', async () => {
+    it('Throw if one file fails to upload', async () => {
       // throw on upload file
       const error = new UploadFileInvalidParameterError();
       const uploadFile = jest.spyOn(runner, 'runSingle').mockRejectedValue(error);

@@ -92,7 +92,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
             folderPath,
             log,
           });
-          items.push(item);
+          item && items.push(item);
         } catch (e) {
           if (e instanceof UploadEmptyFileError) {
             // ignore empty files
@@ -105,9 +105,10 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     }
 
     // create the items
-    const tasks = items.map((item) => iTM.createCreateTaskSequence(member, item, parentId));
+    const tasks = items.map((item) => {
+      return iTM.createCreateTaskSequence(member, item, parentId);
+    });
     const newItems = (await runner.runMultipleSequences(tasks)) as Item[];
-    console.log('newItems: ', newItems);
 
     // recursively create children in folders
     for (const { type, name, id } of newItems) {
