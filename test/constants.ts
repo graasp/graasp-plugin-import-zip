@@ -7,6 +7,7 @@ import { ItemType } from '../src/constants';
 export const FIXTURE_LIGHT_COLOR_ZIP_PATH = './fixtures/lightColor.zip';
 export const FIXTURE_DOT_ZIP_PATH = './fixtures/07.03.2022.zip';
 export const FIXTURE_EMPTY_ITEMS_ZIP_PATH = './fixtures/zipWithEmptyItems.zip';
+export const FIXTURE_IMAGE_ZIP_PATH = './fixtures/zipWithImage.zip';
 
 export const FIXTURE_IMAGE_PATH = './fixtures/img.png';
 export const TMP_FOLDER_PATH = './test/tmp';

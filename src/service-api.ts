@@ -147,15 +147,23 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
 
       const uploadFile: UploadFileFunction = async ({ filepath, mimetype }) => {
         log.debug(`upload ${filepath}`);
+        const size = fs.statSync(filepath).size;
 
+        // avoid creating readstream on empty files
+        if (!size) {
+          throw new UploadEmptyFileError({ filepath });
+        }
+
+        const file = createReadStream(filepath);
         const uploadFilePath = buildFilePathFromPrefix(pathPrefix);
         const uploadTask = fTM.createUploadFileTask(member, {
-          file: createReadStream(filepath),
+          file,
           filepath: uploadFilePath,
           mimetype,
-          size: fs.statSync(filepath).size,
+          size,
         });
         await runner.runSingle(uploadTask);
+
         return uploadFilePath;
       };
 

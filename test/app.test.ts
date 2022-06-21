@@ -20,6 +20,7 @@ import {
   FIXTURE_DOT_ZIP_PATH,
   FIXTURE_EMPTY_ITEMS_ZIP_PATH,
   FIXTURE_IMAGE_PATH,
+  FIXTURE_IMAGE_ZIP_PATH,
   FIXTURE_LIGHT_COLOR_ZIP_PATH,
   ITEM_FOLDER,
   NON_EXISTING_FILE,
@@ -29,6 +30,7 @@ import {
 import { FIXTURES_DOT_CHILDREN_ITEMS, FIXTURE_DOT_PARENT_ITEM } from './fixtures/07.03.2022';
 import { FIXTURES_MOCK_CHILDREN_ITEMS, LIGHT_COLOR_PARENT_ITEM } from './fixtures/lightColor';
 import { FIXTURES_MOCK_CHILDREN_EMPTY_ITEMS } from './fixtures/zipWithEmptyItems';
+import { FIXTURES_ZIP_WITH_IMAGE } from './fixtures/zipWithImage';
 import {
   mockCreateGetChildrenTaskSequence,
   mockCreateGetTaskSequence,
@@ -150,6 +152,43 @@ describe('Import Zip', () => {
       expect(res.json()[0].name).toEqual(FIXTURE_DOT_PARENT_ITEM.name);
     });
 
+    it('Ignore empty files in archive', async () => {
+      // throw on upload file
+      const uploadFile = jest
+        .spyOn(runner, 'runSingle')
+        .mockRejectedValue(new UploadEmptyFileError());
+
+      jest.spyOn(taskManager, 'createCreateTaskSequence').mockReturnValue([new MockTask(true)]);
+      jest.spyOn(taskManager, 'createUpdateTaskSequence').mockReturnValue([new MockTask(true)]);
+
+      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
+        // first level
+        if (tasks.length === 2) {
+          return FIXTURES_MOCK_CHILDREN_EMPTY_ITEMS;
+        }
+        return [];
+      });
+
+      const app = await build({
+        plugin,
+        taskManager,
+        runner,
+      });
+
+      const form = new FormData();
+      const filepath = path.resolve(__dirname, FIXTURE_EMPTY_ITEMS_ZIP_PATH);
+      form.append('file', createReadStream(filepath));
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/zip-import',
+        payload: form,
+        headers: form.getHeaders(),
+      });
+      expect(uploadFile).not.toHaveBeenCalled();
+      expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
     it('Successfully import zip in parent', async () => {
       jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
         // first level
@@ -231,43 +270,6 @@ describe('Import Zip', () => {
       expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it('Ignore empty files in archive', async () => {
-      // throw on upload file
-      const uploadFile = jest
-        .spyOn(runner, 'runSingle')
-        .mockRejectedValue(new UploadEmptyFileError());
-
-      jest.spyOn(taskManager, 'createCreateTaskSequence').mockReturnValue([new MockTask(true)]);
-      jest.spyOn(taskManager, 'createUpdateTaskSequence').mockReturnValue([new MockTask(true)]);
-
-      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
-        // first level
-        if (tasks.length === 2) {
-          return FIXTURES_MOCK_CHILDREN_EMPTY_ITEMS;
-        }
-        return [];
-      });
-
-      const app = await build({
-        plugin,
-        taskManager,
-        runner,
-      });
-
-      const form = new FormData();
-      const filepath = path.resolve(__dirname, FIXTURE_EMPTY_ITEMS_ZIP_PATH);
-      form.append('file', createReadStream(filepath));
-
-      const res = await app.inject({
-        method: 'POST',
-        url: '/zip-import',
-        payload: form,
-        headers: form.getHeaders(),
-      });
-      expect(uploadFile).toHaveBeenCalled();
-      expect(res.statusCode).toBe(StatusCodes.OK);
-    });
-
     it('Throw if one file fails to upload', async () => {
       // throw on upload file
       const error = new UploadFileInvalidParameterError();
@@ -276,12 +278,8 @@ describe('Import Zip', () => {
       jest.spyOn(taskManager, 'createCreateTaskSequence').mockReturnValue([new MockTask(true)]);
       jest.spyOn(taskManager, 'createUpdateTaskSequence').mockReturnValue([new MockTask(true)]);
 
-      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async (tasks) => {
-        // first level
-        if (tasks.length === 2) {
-          return FIXTURES_MOCK_CHILDREN_EMPTY_ITEMS;
-        }
-        return [];
+      jest.spyOn(runner, 'runMultipleSequences').mockImplementation(async () => {
+        return FIXTURES_ZIP_WITH_IMAGE;
       });
 
       const app = await build({
@@ -291,7 +289,7 @@ describe('Import Zip', () => {
       });
 
       const form = new FormData();
-      const filepath = path.resolve(__dirname, FIXTURE_EMPTY_ITEMS_ZIP_PATH);
+      const filepath = path.resolve(__dirname, FIXTURE_IMAGE_ZIP_PATH);
       form.append('file', createReadStream(filepath));
 
       const res = await app.inject({
