@@ -9,7 +9,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { FastifyPluginAsync } from 'fastify';
 
 import { Item } from 'graasp';
-import { FileTaskManager } from 'graasp-plugin-file';
+import { FileTaskManager, UploadEmptyFileError } from 'graasp-plugin-file';
 import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
 
 import {
@@ -84,14 +84,25 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       }
       // add new item
       else {
-        const item = await generateItemFromFilename({
-          fileServiceType: serviceMethod,
-          uploadFile,
-          filename,
-          folderPath,
-          log,
-        });
-        item && items.push(item);
+        try {
+          const item = await generateItemFromFilename({
+            fileServiceType: serviceMethod,
+            uploadFile,
+            filename,
+            folderPath,
+            log,
+          });
+          if (item) {
+            items.push(item);
+          }
+        } catch (e) {
+          if (e instanceof UploadEmptyFileError) {
+            // ignore empty files
+          } else {
+            // improvement: return a list of failed imports
+            throw e;
+          }
+        }
       }
     }
 
@@ -136,15 +147,23 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
 
       const uploadFile: UploadFileFunction = async ({ filepath, mimetype }) => {
         log.debug(`upload ${filepath}`);
+        const size = fs.statSync(filepath).size;
 
+        // avoid creating readstream on empty files
+        if (!size) {
+          throw new UploadEmptyFileError({ filepath });
+        }
+
+        const file = createReadStream(filepath);
         const uploadFilePath = buildFilePathFromPrefix(pathPrefix);
         const uploadTask = fTM.createUploadFileTask(member, {
-          file: createReadStream(filepath),
+          file,
           filepath: uploadFilePath,
           mimetype,
-          size: fs.statSync(filepath).size,
+          size,
         });
         await runner.runSingle(uploadTask);
+
         return uploadFilePath;
       };
 

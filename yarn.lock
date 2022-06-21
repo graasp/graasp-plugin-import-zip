@@ -3373,29 +3373,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify-error@npm:^0.3.0":
-  version: 0.3.1
-  resolution: "fastify-error@npm:0.3.1"
-  checksum: fd6a0f6f87b5e4ab59a4d3d66124bd13830a1cf85cf1987259dfb1175fc6a4bcae68b076ad78f6bb06654f72af133b44813090e9ce5502d2ef56ddcb2b0fa867
-  languageName: node
-  linkType: hard
-
-"fastify-multipart@npm:5.3.1":
-  version: 5.3.1
-  resolution: "fastify-multipart@npm:5.3.1"
-  dependencies:
-    "@fastify/busboy": ^1.0.0
-    deepmerge: ^4.2.2
-    end-of-stream: ^1.4.4
-    fastify-error: ^0.3.0
-    fastify-plugin: ^3.0.0
-    hexoid: ^1.0.0
-    secure-json-parse: ^2.4.0
-    stream-wormhole: ^1.1.0
-  checksum: e471f7b01bb8c9b61c89dcd469c8846043285cfb7d4d594641397908408474059caaca4f5b5bba74cfd41e3d7f40af2b932340d047110962f7bd3de2c15ed373
-  languageName: node
-  linkType: hard
-
 "fastify-plugin@npm:^3.0.0":
   version: 3.0.1
   resolution: "fastify-plugin@npm:3.0.1"
@@ -3561,7 +3538,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^10.0.0":
+"fs-extra@npm:10.1.0, fs-extra@npm:^10.0.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
   dependencies:
@@ -3852,14 +3829,16 @@ __metadata:
 
 "graasp-plugin-file@github:graasp/graasp-plugin-file":
   version: 0.1.0
-  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=bfe7308de0d05b137d57cb7af9d34b8081e365cc"
+  resolution: "graasp-plugin-file@https://github.com/graasp/graasp-plugin-file.git#commit=ee9e32c6d64c8e100098dc9ed4a1fb51f13dd0ab"
   dependencies:
+    "@fastify/multipart": 6.0.0
+    "@graasp/translations": "github:graasp/graasp-translations"
     aws-sdk: 2.1111.0
     content-disposition: 0.5.4
-    fastify-multipart: 5.3.1
+    fs-extra: 10.1.0
     http-status-codes: 2.2.0
     node-fetch: 2.6.7
-  checksum: e31837cd8c9fb9f8aa4485b7226f36073b966c607c6e2e270c8fba22bc42486d0f4ff32529200cb74364ea7b4e673ca9014478ec0e0dfead4042549cbb0a24e4
+  checksum: f1af7662d87a365d8baf1030cd0b7d21423127cf96e1166f1773479895d7278d7f5b9de4782d4e5a9daf4bd4025d6ea107b559cb681adf6837ad8223390d62a6
   languageName: node
   linkType: hard
 
