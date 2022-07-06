@@ -2,8 +2,12 @@
   "trailingComma": "all",
   "tabWidth": 2,
   "semi": true,
-  "singleQuote": true, 
-  "importOrder": ["^@?fastify*", "^@?graasp*", "^[./]"],
+  "singleQuote": true,
+  "importOrder": [
+    "^@?fastify",
+    "^@?graasp",
+    "^[./]"
+  ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
 }

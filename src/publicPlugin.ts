@@ -18,6 +18,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       items: { taskManager: publicTaskManager },
       graaspActor,
     },
+    h5p: { taskManager: h5pTM },
   } = fastify;
 
   if (!graaspPublicPlugin) {
@@ -43,19 +44,8 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       const getChildrenFromItem: GetChildrenFromItemFunction = async ({ item }) =>
         runner.runSingle(iTM.createGetChildrenTask(member, { item }));
 
-      const downloadFile: DownloadFileFunction = async ({
-        filepath,
-        itemId,
-        mimetype,
-        fileStorage,
-      }) => {
-        const task = fTM.createDownloadFileTask(member, {
-          filepath,
-          itemId,
-          mimetype,
-          fileStorage,
-        });
-
+      const downloadFile: DownloadFileFunction = async ({ taskFactory }) => {
+        const task = taskFactory(member);
         // if file not found, an error will be thrown by this line
         const fileStream = (await runner.runSingle(task)) as ReadStream;
         return fileStream;
@@ -65,6 +55,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         item,
         log,
         reply,
+        fileTaskManagers: { file: fTM, h5p: h5pTM },
         fileServiceType: serviceMethod,
         getChildrenFromItem,
         downloadFile,

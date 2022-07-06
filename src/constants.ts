@@ -11,6 +11,7 @@ export enum ItemType {
   FOLDER = 'folder',
   S3FILE = 's3File',
   LOCALFILE = 'file',
+  H5P = 'h5p',
 }
 
 export const buildSettings = (hasThumbnail) => ({
@@ -27,6 +28,8 @@ export const ZIP_FILE_MIME_TYPES = [
   'application/x-zip-compressed',
   'multipart/x-zip',
 ];
+
+export const H5P_FILE_EXTENSION = '.h5p';
 
 export const URL_PREFIX = 'URL=';
 export const APP_URL_PREFIX = 'AppURL=';

@@ -1,5 +1,5 @@
 import archiver, { Archiver } from 'archiver';
-import fs from 'fs';
+import fs, { ReadStream } from 'fs';
 import { mkdir, readFile } from 'fs/promises';
 import mime from 'mime-types';
 import mmm from 'mmmagic';
@@ -8,14 +8,20 @@ import util from 'util';
 
 import { FastifyLoggerInstance } from 'fastify';
 
-import { Item } from 'graasp';
-import { LocalFileItemExtra, S3FileItemExtra, ServiceMethod } from 'graasp-plugin-file';
+import { Actor, Item, Task } from 'graasp';
+import {
+  FileTaskManager,
+  LocalFileItemExtra,
+  S3FileItemExtra,
+  ServiceMethod,
+} from 'graasp-plugin-file';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 
 import {
   APP_URL_PREFIX,
   DESCRIPTION_EXTENTION,
   GRAASP_DOCUMENT_EXTENSION,
+  H5P_FILE_EXTENSION,
   ItemType,
   LINK_EXTENSION,
   TMP_FOLDER_PATH,
@@ -26,6 +32,7 @@ import type {
   DownloadFileFunction,
   Extra,
   GetChildrenFromItemFunction,
+  H5PTaskManager,
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
@@ -196,6 +203,7 @@ export const addItemToZip = async (args: {
   item: Item;
   archiveRootPath: string;
   archive: Archiver;
+  fileTaskManagers: { file: FileTaskManager; h5p: H5PTaskManager };
   fileServiceType: string;
   fileStorage: string;
   getChildrenFromItem: GetChildrenFromItemFunction;
@@ -205,6 +213,7 @@ export const addItemToZip = async (args: {
     item,
     archiveRootPath,
     archive,
+    fileTaskManagers,
     fileServiceType,
     fileStorage,
     getChildrenFromItem,
@@ -237,10 +246,13 @@ export const addItemToZip = async (args: {
       }
 
       const fileStream = await downloadFile({
-        filepath,
-        itemId: item.id,
-        mimetype,
-        fileStorage,
+        taskFactory: (member: Actor) =>
+          fileTaskManagers.file.createDownloadFileTask(member, {
+            filepath,
+            itemId: item.id,
+            mimetype,
+            fileStorage,
+          }) as Task<Actor, ReadStream>,
       });
 
       // build filename with extension if does not exist
@@ -254,6 +266,17 @@ export const addItemToZip = async (args: {
       // add file in archive
       archive.append(fileStream, {
         name: path.join(archiveRootPath, filename),
+      });
+
+      break;
+    }
+    case ItemType.H5P: {
+      const fileStream = await downloadFile({
+        taskFactory: (member: Actor) =>
+          fileTaskManagers.h5p.createDownloadH5PFileTask(item, fileStorage, member),
+      });
+      archive.append(fileStream, {
+        name: path.join(archiveRootPath, item.name),
       });
 
       break;
@@ -289,6 +312,7 @@ export const addItemToZip = async (args: {
             item: subItem,
             archiveRootPath: folderPath,
             archive,
+            fileTaskManagers,
             fileServiceType,
             fileStorage,
             getChildrenFromItem,
@@ -296,6 +320,7 @@ export const addItemToZip = async (args: {
           }),
         ),
       );
+      break;
     }
   }
 };
@@ -305,6 +330,7 @@ export const buildStoragePath = (itemId) => path.join(__dirname, TMP_FOLDER_PATH
 export const prepareArchiveFromItem = async ({
   item,
   log,
+  fileTaskManagers,
   fileServiceType,
   reply,
   getChildrenFromItem,
@@ -339,6 +365,7 @@ export const prepareArchiveFromItem = async ({
       item,
       archiveRootPath: rootPath,
       archive,
+      fileTaskManagers,
       fileServiceType,
       fileStorage,
       getChildrenFromItem,
