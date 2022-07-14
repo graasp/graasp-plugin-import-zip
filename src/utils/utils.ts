@@ -8,15 +8,13 @@ import util from 'util';
 
 import { FastifyLoggerInstance } from 'fastify';
 
-import { Item } from 'graasp';
-import { LocalFileItemExtra, S3FileItemExtra, ServiceMethod } from 'graasp-plugin-file';
+import { Item, ItemType, LocalFileItemExtra, S3FileItemExtra } from '@graasp/sdk';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 
 import {
   APP_URL_PREFIX,
   DESCRIPTION_EXTENTION,
   GRAASP_DOCUMENT_EXTENSION,
-  ItemType,
   LINK_EXTENSION,
   TMP_FOLDER_PATH,
   URL_PREFIX,
@@ -219,11 +217,11 @@ export const addItemToZip = async (args: {
       let filepath = '';
       let mimetype = '';
       // check for service type and assign filepath, mimetype respectively
-      if (fileServiceType === ServiceMethod.S3) {
+      if (fileServiceType === ItemType.S3_FILE) {
         const s3Extra = item?.extra as S3FileItemExtra;
         filepath = s3Extra?.s3File?.path;
         mimetype = s3Extra?.s3File?.mimetype;
-      } else if (fileServiceType === ServiceMethod.LOCAL) {
+      } else if (fileServiceType === ItemType.LOCAL_FILE) {
         const fileExtra = item.extra as LocalFileItemExtra;
         filepath = fileExtra?.file?.path;
         mimetype = fileExtra?.file?.mimetype;

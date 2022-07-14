@@ -1,4 +1,4 @@
-import { Actor, Item, Task } from 'graasp';
+import { Actor, Item, Task } from '@graasp/sdk';
 import { ItemTaskManager, Task as MockTask } from 'graasp-test';
 
 export const mockCreateGetTaskSequence = ({ itemTaskManager, parentItem, subItems }) => {

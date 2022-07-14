@@ -2,7 +2,7 @@ import fs, { ReadStream } from 'fs';
 
 import { FastifyPluginAsync } from 'fastify';
 
-import { Item } from 'graasp';
+import { Item } from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
 

@@ -1,14 +1,13 @@
 import FormData from 'form-data';
 import { StatusCodes } from 'http-status-codes';
 
-import { Item } from 'graasp';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { Item, ItemType } from '@graasp/sdk';
+import { FileTaskManager } from 'graasp-plugin-file';
 import { PublicItemTaskManager } from 'graasp-plugin-public';
 import { BasePublicItemTask } from 'graasp-plugin-public/dist/services/item/tasks/base-public-item-task';
 import { ItemTaskManager, TaskRunner } from 'graasp-test';
 import MockTask from 'graasp-test/src/tasks/task';
 
-import { ItemType } from '../src/constants';
 import plugin from '../src/publicPlugin';
 import build, { DEFAULT_OPTIONS } from './app';
 import { ITEM_FOLDER, NON_EXISTING_FILE, SUB_ITEMS } from './constants';
@@ -84,8 +83,8 @@ describe('Export Zip', () => {
       parentItem: NON_EXISTING_FILE,
     });
     const fileTaskManager = new FileTaskManager(
-      DEFAULT_OPTIONS.serviceOptions,
-      ServiceMethod.LOCAL,
+      DEFAULT_OPTIONS.fileConfigurations,
+      ItemType.LOCAL_FILE,
     );
 
     jest.spyOn(fileTaskManager, 'createDownloadFileTask').mockImplementation(() => {
