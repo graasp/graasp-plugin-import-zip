@@ -85,7 +85,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       else {
         try {
           const item = await generateItemFromFilename({
-            fileServiceType: fileItemType,
+            fileItemType: fileItemType,
             uploadFile,
             filename,
             folderPath,
@@ -242,7 +242,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         item,
         log,
         reply,
-        fileServiceType: fileItemType,
+        fileItemType: fileItemType,
         getChildrenFromItem,
         downloadFile,
       });

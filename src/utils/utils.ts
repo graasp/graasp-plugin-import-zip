@@ -36,10 +36,10 @@ export const generateItemFromFilename = async (options: {
   filename: string;
   folderPath: string;
   log: FastifyLoggerInstance;
-  fileServiceType: string;
+  fileItemType: string;
   uploadFile: UploadFileFunction;
 }): Promise<Partial<Item> | null> => {
-  const { filename, uploadFile, fileServiceType, folderPath } = options;
+  const { filename, uploadFile, fileItemType, folderPath } = options;
 
   // ignore hidden files such as .DS_STORE
   if (filename.startsWith('.')) {
@@ -111,9 +111,9 @@ export const generateItemFromFilename = async (options: {
     // create file item
     return {
       name: filename.substring(0, ORIGINAL_FILENAME_TRUNCATE_LIMIT),
-      type: fileServiceType,
+      type: fileItemType,
       extra: {
-        [fileServiceType]: {
+        [fileItemType]: {
           name: filename,
           path: uploadFilePath,
           size,
@@ -194,7 +194,7 @@ export const addItemToZip = async (args: {
   item: Item;
   archiveRootPath: string;
   archive: Archiver;
-  fileServiceType: string;
+  fileItemType: string;
   fileStorage: string;
   getChildrenFromItem: GetChildrenFromItemFunction;
   downloadFile: DownloadFileFunction;
@@ -203,7 +203,7 @@ export const addItemToZip = async (args: {
     item,
     archiveRootPath,
     archive,
-    fileServiceType,
+    fileItemType,
     fileStorage,
     getChildrenFromItem,
     downloadFile,
@@ -213,21 +213,21 @@ export const addItemToZip = async (args: {
   let subItems = null;
 
   switch (item.type) {
-    case fileServiceType: {
+    case fileItemType: {
       let filepath = '';
       let mimetype = '';
       // check for service type and assign filepath, mimetype respectively
-      if (fileServiceType === ItemType.S3_FILE) {
+      if (fileItemType === ItemType.S3_FILE) {
         const s3Extra = item?.extra as S3FileItemExtra;
         filepath = s3Extra?.s3File?.path;
         mimetype = s3Extra?.s3File?.mimetype;
-      } else if (fileServiceType === ItemType.LOCAL_FILE) {
+      } else if (fileItemType === ItemType.LOCAL_FILE) {
         const fileExtra = item.extra as LocalFileItemExtra;
         filepath = fileExtra?.file?.path;
         mimetype = fileExtra?.file?.mimetype;
       } else {
         // throw if service type is neither
-        console.error(`fileServiceType invalid: ${fileServiceType}`);
+        console.error(`fileItemType invalid: ${fileItemType}`);
       }
 
       if (!filepath || !mimetype) {
@@ -287,7 +287,7 @@ export const addItemToZip = async (args: {
             item: subItem,
             archiveRootPath: folderPath,
             archive,
-            fileServiceType,
+            fileItemType,
             fileStorage,
             getChildrenFromItem,
             downloadFile,
@@ -303,7 +303,7 @@ export const buildStoragePath = (itemId) => path.join(__dirname, TMP_FOLDER_PATH
 export const prepareArchiveFromItem = async ({
   item,
   log,
-  fileServiceType,
+  fileItemType,
   reply,
   getChildrenFromItem,
   downloadFile,
@@ -337,7 +337,7 @@ export const prepareArchiveFromItem = async ({
       item,
       archiveRootPath: rootPath,
       archive,
-      fileServiceType,
+      fileItemType,
       fileStorage,
       getChildrenFromItem,
       downloadFile,

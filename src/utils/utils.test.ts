@@ -48,7 +48,7 @@ describe('Utils', () => {
         filename: '.hiddenfile',
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -59,7 +59,7 @@ describe('Utils', () => {
         filename: FOLDER_NAME,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -74,7 +74,7 @@ describe('Utils', () => {
         filename: imageFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -104,7 +104,7 @@ describe('Utils', () => {
         filename: imageFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -134,7 +134,7 @@ describe('Utils', () => {
         filename: documentFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
       const filepath = path.resolve(__dirname, '../../test', FOLDER_PATH, documentFilename);
@@ -160,7 +160,7 @@ describe('Utils', () => {
         filename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -181,7 +181,7 @@ describe('Utils', () => {
         filename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -332,7 +332,7 @@ describe('Utils', () => {
         item: ITEM_LOCAL,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: ItemType.LOCAL_FILE,
+        fileItemType: ItemType.LOCAL_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
@@ -354,7 +354,7 @@ describe('Utils', () => {
         item: ITEM_S3,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: ItemType.S3_FILE,
+        fileItemType: ItemType.S3_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
