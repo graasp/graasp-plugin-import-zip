@@ -3962,10 +3962,10 @@ __metadata:
 
 "graasp-test@github:graasp/graasp-test#23/sdk":
   version: 0.1.0
-  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=73af5781a47ba63fc9e8012c916dad4272ca21b1"
+  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=9282475d25c770aa53b78a158644d4d714230066"
   dependencies:
     uuid: 8.3.2
-  checksum: 76630f0be124bab0e460f8bfebc5811c29402b42ff693befdf920d9871a9390d701be6dd5abd2e88e0d53280f642fda62c68192f99e635eccba9f0fd6f325400
+  checksum: d30e28e785e245ec15335595661cf1ec9b228ab75b99977d0ded48c037d73404099adab4c2d1c79d9970480613837c4d05989d65434deb4884ae7c846281818f
   languageName: node
   linkType: hard
 

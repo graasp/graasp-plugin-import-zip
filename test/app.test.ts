@@ -10,8 +10,7 @@ import {
   UploadEmptyFileError,
   UploadFileInvalidParameterError,
 } from 'graasp-plugin-file';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
-import MockTask from 'graasp-test/src/tasks/task';
+import { ItemTaskManager, TaskRunner, Task as MockTask } from 'graasp-test';
 
 import plugin from '../src/service-api';
 import build, { DEFAULT_OPTIONS } from './app';
