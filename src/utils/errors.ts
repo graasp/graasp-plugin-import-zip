@@ -1,11 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { BaseGraaspError } from '@graasp/sdk';
+import { ErrorFactory } from '@graasp/sdk';
 
 import { PLUGIN_NAME } from '../constants';
 
-export class FileIsInvalidArchiveError extends BaseGraaspError {
-  origin = PLUGIN_NAME;
+export const GraaspError = ErrorFactory(PLUGIN_NAME);
+export class FileIsInvalidArchiveError extends GraaspError {
   constructor(data?: unknown) {
     super(
       {
@@ -18,8 +18,7 @@ export class FileIsInvalidArchiveError extends BaseGraaspError {
   }
 }
 
-export class InvalidFileItemError extends BaseGraaspError {
-  origin = PLUGIN_NAME;
+export class InvalidFileItemError extends GraaspError {
   constructor(data?: unknown) {
     super(
       {

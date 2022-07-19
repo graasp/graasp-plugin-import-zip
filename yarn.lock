@@ -867,7 +867,7 @@ __metadata:
 
 "@graasp/sdk@github:graasp/graasp-utils#15/testUtils":
   version: 0.1.0
-  resolution: "@graasp/sdk@https://github.com/graasp/graasp-utils.git#commit=661117d8b5116b7ebfe39e43f39f3c8eb65b3e7c"
+  resolution: "@graasp/sdk@https://github.com/graasp/graasp-utils.git#commit=4b1cc0b372be2daf27b194d16c3527cceb2cccf7"
   dependencies:
     "@fastify/secure-session": 5.2.0
     aws-sdk: 2.1111.0
@@ -877,7 +877,7 @@ __metadata:
     qs: 6.11.0
     slonik: 28.1.1
     uuid: 8.3.2
-  checksum: 667b0eea9bfaf14ffeae3b27a7eebfdc3b566362f5655fdd089551bd40bb797d4496968acea04f19e044f242170afd2d7698a1037bbca42c8f3af2c26e802955
+  checksum: b8e2d75f7a35aa3550bcf54aa998e5bb1738447095b4ee26102cf354e748399532ac4518f22a64c2f11d6cba82196dca3cace4256d16fafee0c548885f818193
   languageName: node
   linkType: hard
 
@@ -3962,8 +3962,10 @@ __metadata:
 
 "graasp-test@github:graasp/graasp-test#23/sdk":
   version: 0.1.0
-  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=1cffcd6e6e6c3a67d5f006a720bf0787f47c82c2"
-  checksum: cce9a89010b8b3db2eb23b629283ab9e0816406ecf39aec50d8cd17a50861d12f4a52362496dd2ac439652d6108d54a892b4009b52de3fd0852eb280ba8adfe3
+  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=73af5781a47ba63fc9e8012c916dad4272ca21b1"
+  dependencies:
+    uuid: 8.3.2
+  checksum: 76630f0be124bab0e460f8bfebc5811c29402b42ff693befdf920d9871a9390d701be6dd5abd2e88e0d53280f642fda62c68192f99e635eccba9f0fd6f325400
   languageName: node
   linkType: hard
 
