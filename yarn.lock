@@ -865,6 +865,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graasp/sdk@github:graasp/graasp-sdk":
+  version: 0.1.0
+  resolution: "@graasp/sdk@https://github.com/graasp/graasp-sdk.git#commit=513b28bc7081aca26ab55088eb12618f51eff922"
+  dependencies:
+    "@fastify/secure-session": 5.2.0
+    aws-sdk: 2.1111.0
+    fastify: ^3.29.1
+    fluent-json-schema: 3.1.0
+    js-cookie: 3.0.1
+    qs: 6.11.0
+    slonik: 28.1.1
+    uuid: 8.3.2
+  checksum: b8e2d75f7a35aa3550bcf54aa998e5bb1738447095b4ee26102cf354e748399532ac4518f22a64c2f11d6cba82196dca3cace4256d16fafee0c548885f818193
+  languageName: node
+  linkType: hard
+
 "@graasp/sdk@github:graasp/graasp-utils#15/testUtils":
   version: 0.1.0
   resolution: "@graasp/sdk@https://github.com/graasp/graasp-utils.git#commit=4b1cc0b372be2daf27b194d16c3527cceb2cccf7"
@@ -3897,7 +3913,7 @@ __metadata:
     "@commitlint/cli": 16.2.4
     "@commitlint/config-conventional": 16.2.4
     "@fastify/multipart": 6.0.0
-    "@graasp/sdk": "github:graasp/graasp-utils#15/testUtils"
+    "@graasp/sdk": "github:graasp/graasp-sdk"
     "@trivago/prettier-plugin-sort-imports": 3.2.0
     "@types/archiver": 5.3.1
     "@types/eslint": 8.4.2
@@ -3918,7 +3934,7 @@ __metadata:
     graasp-plugin-file: "github:graasp/graasp-plugin-file#29/sdk"
     graasp-plugin-file-item: "github:graasp/graasp-plugin-file-item#36/sdk"
     graasp-plugin-public: "github:graasp/graasp-plugin-public"
-    graasp-test: "github:graasp/graasp-test#23/sdk"
+    graasp-test: "github:graasp/graasp-test"
     http-status-codes: 2.2.0
     husky: 8.0.1
     jest: 28.1.0
@@ -3960,12 +3976,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graasp-test@github:graasp/graasp-test#23/sdk":
+"graasp-test@github:graasp/graasp-test":
   version: 0.1.0
-  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=9282475d25c770aa53b78a158644d4d714230066"
+  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=3ff1f7951d1c2439f84fab546bf8de60b530bd1c"
   dependencies:
     uuid: 8.3.2
-  checksum: d30e28e785e245ec15335595661cf1ec9b228ab75b99977d0ded48c037d73404099adab4c2d1c79d9970480613837c4d05989d65434deb4884ae7c846281818f
+  checksum: aaa3759fe2842de03fdc99011623dced835636fe5e15598c8574b9d526c040615dac3bf06fd351007a07d267493f9cd4e70c14ef35b0b73fb2810f90be4bbae8
   languageName: node
   linkType: hard
 
