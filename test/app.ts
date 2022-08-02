@@ -48,6 +48,11 @@ const build = async ({
       taskManager: publicItemTaskManager,
     },
   });
+  app.decorate('h5p', {
+    taskManager: {
+      createDownloadH5PTask: async () => {},
+    },
+  });
 
   await app.register(plugin, DEFAULT_OPTIONS);
 
