@@ -1,6 +1,4 @@
-import { Item } from 'graasp';
-
-import { ItemType } from '../../src/constants';
+import { Item, ItemType } from '@graasp/sdk';
 
 export const LIGHT_COLOR_PARENT_ITEM = { name: 'Light Color', type: ItemType.FOLDER };
 

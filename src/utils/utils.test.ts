@@ -5,8 +5,8 @@ import path from 'path';
 
 import { FastifyLoggerInstance } from 'fastify';
 
-import { Item } from 'graasp';
-import { FileTaskManager, ServiceMethod } from 'graasp-plugin-file';
+import { Item, ItemType } from '@graasp/sdk';
+import { FileTaskManager } from 'graasp-plugin-file';
 import { TaskRunner } from 'graasp-test';
 import MockTask from 'graasp-test/src/tasks/task';
 
@@ -22,7 +22,7 @@ import {
   IMAGE_NAME_WITHOUT_EXTENSION,
   LINK_NAME,
 } from '../../test/fixtures/utils/fixtureUtils';
-import { DESCRIPTION_EXTENTION, ItemType, buildSettings } from '../constants';
+import { DESCRIPTION_EXTENTION, buildSettings } from '../constants';
 import { addItemToZip, generateItemFromFilename, handleItemDescription } from './utils';
 
 const DEFAULT_FILE_SERVICE_TYPE = 'file';
@@ -48,7 +48,7 @@ describe('Utils', () => {
         filename: '.hiddenfile',
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -59,7 +59,7 @@ describe('Utils', () => {
         filename: FOLDER_NAME,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -74,7 +74,7 @@ describe('Utils', () => {
         filename: imageFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -104,7 +104,7 @@ describe('Utils', () => {
         filename: imageFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
       });
 
@@ -134,7 +134,7 @@ describe('Utils', () => {
         filename: documentFilename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
       const filepath = path.resolve(__dirname, '../../test', FOLDER_PATH, documentFilename);
@@ -160,7 +160,7 @@ describe('Utils', () => {
         filename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -181,7 +181,7 @@ describe('Utils', () => {
         filename,
         folderPath: path.resolve(__dirname, '../../test', FOLDER_PATH),
         log: DEFAULT_LOGGER,
-        fileServiceType: DEFAULT_FILE_SERVICE_TYPE,
+        fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
       });
 
@@ -317,10 +317,10 @@ describe('Utils', () => {
       jest.spyOn(runner, 'runSingle').mockImplementation(async (task) => task.result);
     });
 
-    it(ItemType.LOCALFILE, async () => {
+    it(ItemType.LOCAL_FILE, async () => {
       const localFileTaskManager = new FileTaskManager(
         DEFAULT_OPTIONS.serviceOptions,
-        ServiceMethod.LOCAL,
+        ItemType.LOCAL_FILE,
       );
       buildMock(localFileTaskManager, ITEM_LOCAL);
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
@@ -332,17 +332,17 @@ describe('Utils', () => {
         item: ITEM_LOCAL,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: ServiceMethod.LOCAL,
+        fileItemType: ItemType.LOCAL_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
       });
     });
 
-    it(ItemType.S3FILE, async () => {
+    it(ItemType.S3_FILE, async () => {
       const S3FileTaskManager = new FileTaskManager(
         DEFAULT_OPTIONS.serviceOptions,
-        ServiceMethod.S3,
+        ItemType.S3_FILE,
       );
       buildMock(S3FileTaskManager, ITEM_S3);
       jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
@@ -354,7 +354,7 @@ describe('Utils', () => {
         item: ITEM_S3,
         archiveRootPath: '',
         archive: archiverMock,
-        fileServiceType: ServiceMethod.S3,
+        fileItemType: ItemType.S3_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),

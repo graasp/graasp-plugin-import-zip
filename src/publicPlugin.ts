@@ -2,7 +2,7 @@ import fs, { ReadStream } from 'fs';
 
 import { FastifyPluginAsync } from 'fastify';
 
-import { Item } from 'graasp';
+import { Item } from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
 import graaspPublicPlugin from 'graasp-plugin-public';
 
@@ -24,9 +24,9 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     throw new Error('Public plugin is not correctly defined');
   }
 
-  const { serviceMethod, serviceOptions } = options;
+  const { fileItemType, fileConfigurations } = options;
 
-  const fTM = new FileTaskManager(serviceOptions, serviceMethod);
+  const fTM = new FileTaskManager(fileConfigurations, fileItemType);
 
   // download item as zip
   fastify.route<{ Params: { itemId: string } }>({
@@ -65,7 +65,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         item,
         log,
         reply,
-        fileServiceType: serviceMethod,
+        fileItemType,
         getChildrenFromItem,
         downloadFile,
       });

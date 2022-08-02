@@ -1,16 +1,11 @@
 import { ReadStream } from 'fs';
 
-import { Item } from 'graasp';
-import {
-  GraaspLocalFileItemOptions,
-  GraaspS3FileItemOptions,
-  ServiceMethod,
-} from 'graasp-plugin-file';
+import { FileItemType, Item, LocalFileConfiguration, S3FileConfiguration } from '@graasp/sdk';
 
 export interface GraaspPluginZipOptions {
   pathPrefix: string;
-  serviceMethod: ServiceMethod;
-  serviceOptions: { s3: GraaspS3FileItemOptions; local: GraaspLocalFileItemOptions };
+  fileItemType: FileItemType;
+  fileConfigurations: { s3: S3FileConfiguration; local: LocalFileConfiguration };
 }
 
 export type UploadFileFunction = ({ filepath, mimetype }) => Promise<string>;

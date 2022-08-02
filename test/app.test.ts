@@ -4,16 +4,14 @@ import { StatusCodes } from 'http-status-codes';
 import path from 'path';
 import { v4 } from 'uuid';
 
+import { ItemType } from '@graasp/sdk';
 import {
   FileTaskManager,
-  ServiceMethod,
   UploadEmptyFileError,
   UploadFileInvalidParameterError,
 } from 'graasp-plugin-file';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
-import MockTask from 'graasp-test/src/tasks/task';
+import { ItemTaskManager, Task as MockTask, TaskRunner } from 'graasp-test';
 
-import { ItemType } from '../src/constants';
 import plugin from '../src/service-api';
 import build, { DEFAULT_OPTIONS } from './app';
 import {
@@ -361,8 +359,8 @@ describe('Export Zip', () => {
       .spyOn(taskManager, 'createGetTaskSequence')
       .mockImplementation(() => [new MockTask(NON_EXISTING_FILE)]);
     const fileTaskManager = new FileTaskManager(
-      DEFAULT_OPTIONS.serviceOptions,
-      ServiceMethod.LOCAL,
+      DEFAULT_OPTIONS.fileConfigurations,
+      ItemType.LOCAL_FILE,
     );
 
     jest.spyOn(fileTaskManager, 'createDownloadFileTask').mockImplementation(() => {
