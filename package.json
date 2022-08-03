@@ -11,7 +11,7 @@
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "prettier:check": "prettier --check \"{src,test}/**/*.ts\"",
     "prettier:write": "prettier --write \"{src,test}/**/*.ts\"",
-    "test": "jest test/app.test.ts --forceExit --coverage --verbose",
+    "test": "jest --forceExit --coverage --verbose",
     "test:watch": "yarn test --watchAll",
     "pre-commit": "yarn prettier:check && yarn lint",
     "hooks:uninstall": "husky uninstall",

@@ -53,6 +53,18 @@ export const ITEM_S3 = {
     },
   },
 };
+export const ITEM_H5P = {
+  ...BASE_ITEM,
+  type: ItemType.H5P,
+  name: 'h5pFile.h5p',
+  extra: {
+    h5p: {
+      contentId: 'mock-h5p-content-id',
+      h5pFilePath: 'foo/h5pFile.h5p',
+      contentFilePath: 'foo/content',
+    },
+  },
+};
 export const SUB_ITEMS: Item[] = [
   {
     id: 'fdf09f5a-5688-11eb-ae93-0242ac130004',

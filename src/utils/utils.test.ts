@@ -7,11 +7,10 @@ import { FastifyLoggerInstance } from 'fastify';
 
 import { Item, ItemType } from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
-import { TaskRunner } from 'graasp-test';
-import MockTask from 'graasp-test/src/tasks/task';
+import { Task, TaskRunner } from 'graasp-test';
 
 import { DEFAULT_OPTIONS } from '../../test/app';
-import { FIXTURE_IMAGE_PATH, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
+import { FIXTURE_IMAGE_PATH, ITEM_H5P, ITEM_LOCAL, ITEM_S3 } from '../../test/constants';
 import {
   APP_NAME,
   DEFAULT_FOLDER_NAME,
@@ -33,10 +32,8 @@ const buildMock = (taskManager: FileTaskManager, mockItem) =>
   jest.spyOn(taskManager, 'createDownloadFileTask').mockImplementation((member, { itemId }) => {
     if (mockItem.id === itemId)
       // set task result to a valid readstream, content doesn't matter here
-      return new MockTask(
-        createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)),
-      );
-    else return new MockTask(null);
+      return new Task(createReadStream(path.resolve(__dirname, '../../test', FIXTURE_IMAGE_PATH)));
+    else return new Task(null);
   });
 
 describe('Utils', () => {
@@ -311,6 +308,9 @@ describe('Utils', () => {
   describe('addItemToZip', () => {
     const archiverMock = archiver.create('zip');
     const runner = new TaskRunner();
+    const h5pTaskManager = {
+      createDownloadH5PFileTask: jest.fn(),
+    };
 
     beforeEach(() => {
       jest.clearAllMocks();
@@ -319,12 +319,12 @@ describe('Utils', () => {
 
     it(ItemType.LOCAL_FILE, async () => {
       const localFileTaskManager = new FileTaskManager(
-        DEFAULT_OPTIONS.serviceOptions,
+        DEFAULT_OPTIONS.fileConfigurations,
         ItemType.LOCAL_FILE,
       );
       buildMock(localFileTaskManager, ITEM_LOCAL);
-      jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
-        expect(name).toEqual(ITEM_LOCAL.name);
+      jest.spyOn(archiverMock, 'append').mockImplementation((stream, entry) => {
+        expect(entry?.name).toEqual(ITEM_LOCAL.name);
         return archiverMock;
       });
 
@@ -332,6 +332,7 @@ describe('Utils', () => {
         item: ITEM_LOCAL,
         archiveRootPath: '',
         archive: archiverMock,
+        fileTaskManagers: { file: localFileTaskManager, h5p: h5pTaskManager },
         fileItemType: ItemType.LOCAL_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
@@ -341,12 +342,12 @@ describe('Utils', () => {
 
     it(ItemType.S3_FILE, async () => {
       const S3FileTaskManager = new FileTaskManager(
-        DEFAULT_OPTIONS.serviceOptions,
+        DEFAULT_OPTIONS.fileConfigurations,
         ItemType.S3_FILE,
       );
       buildMock(S3FileTaskManager, ITEM_S3);
-      jest.spyOn(archiverMock, 'append').mockImplementation((stream, { name }) => {
-        expect(name).toEqual(ITEM_S3.name);
+      jest.spyOn(archiverMock, 'append').mockImplementation((stream, entry) => {
+        expect(entry?.name).toEqual(ITEM_S3.name);
         return archiverMock;
       });
 
@@ -354,6 +355,30 @@ describe('Utils', () => {
         item: ITEM_S3,
         archiveRootPath: '',
         archive: archiverMock,
+        fileTaskManagers: { file: S3FileTaskManager, h5p: h5pTaskManager },
+        fileItemType: ItemType.S3_FILE,
+        fileStorage: '',
+        getChildrenFromItem: jest.fn(),
+        downloadFile: jest.fn(),
+      });
+    });
+
+    it(ItemType.H5P, async () => {
+      const S3FileTaskManager = new FileTaskManager(
+        DEFAULT_OPTIONS.fileConfigurations,
+        ItemType.S3_FILE,
+      );
+      buildMock(S3FileTaskManager, ITEM_H5P);
+      jest.spyOn(archiverMock, 'append').mockImplementation((stream, entry) => {
+        expect(entry?.name).toEqual(ITEM_H5P.name);
+        return archiverMock;
+      });
+
+      await addItemToZip({
+        item: ITEM_H5P,
+        archiveRootPath: '',
+        archive: archiverMock,
+        fileTaskManagers: { file: S3FileTaskManager, h5p: h5pTaskManager },
         fileItemType: ItemType.S3_FILE,
         fileStorage: '',
         getChildrenFromItem: jest.fn(),

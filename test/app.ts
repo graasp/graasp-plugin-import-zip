@@ -50,7 +50,7 @@ const build = async ({
   });
   app.decorate('h5p', {
     taskManager: {
-      createDownloadH5PTask: async () => {},
+      createDownloadH5PFileTask: jest.fn(),
     },
   });
 
