@@ -2,12 +2,14 @@ import { ReadStream } from 'fs';
 
 import { FastifyInstance } from 'fastify';
 
-import { Actor, Item, Task } from 'graasp';
 import {
-  GraaspLocalFileItemOptions,
-  GraaspS3FileItemOptions,
-  ServiceMethod,
-} from 'graasp-plugin-file';
+  Actor,
+  FileItemType,
+  Item,
+  LocalFileConfiguration,
+  S3FileConfiguration,
+  Task,
+} from '@graasp/sdk';
 
 /**
  * Workaround to get Typescript to know about the fastify instance augmentation
@@ -27,8 +29,8 @@ export type H5PTaskManager = FastifyInstance['h5p']['taskManager'];
 
 export interface GraaspPluginZipOptions {
   pathPrefix: string;
-  serviceMethod: ServiceMethod;
-  serviceOptions: { s3: GraaspS3FileItemOptions; local: GraaspLocalFileItemOptions };
+  fileItemType: FileItemType;
+  fileConfigurations: { s3: S3FileConfiguration; local: LocalFileConfiguration };
 }
 
 export type UploadFileFunction = ({ filepath, mimetype }) => Promise<string>;

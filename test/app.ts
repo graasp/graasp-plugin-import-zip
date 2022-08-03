@@ -1,6 +1,6 @@
 import fastify, { FastifyInstance, FastifyPluginAsync } from 'fastify';
 
-import { ServiceMethod } from 'graasp-plugin-file';
+import { FileItemType, ItemType } from '@graasp/sdk';
 import { PublicItemTaskManager } from 'graasp-plugin-public';
 import { ItemTaskManager, TaskRunner } from 'graasp-test';
 
@@ -17,8 +17,8 @@ type props = {
 
 export const DEFAULT_OPTIONS = {
   pathPrefix: 'pathPrefix',
-  serviceMethod: ServiceMethod.LOCAL,
-  serviceOptions: {
+  fileItemType: ItemType.LOCAL_FILE as FileItemType,
+  fileConfigurations: {
     s3: {
       s3Region: 's3Region',
       s3Bucket: 's3Bucket',

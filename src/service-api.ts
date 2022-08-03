@@ -8,14 +8,13 @@ import { v4 } from 'uuid';
 import fastifyMultipart from '@fastify/multipart';
 import { FastifyPluginAsync } from 'fastify';
 
-import { Item } from 'graasp';
+import { Item, ItemType } from '@graasp/sdk';
 import { FileTaskManager, UploadEmptyFileError } from 'graasp-plugin-file';
 import { buildFilePathFromPrefix } from 'graasp-plugin-file-item';
 
 import {
   DEFAULT_MAX_FILE_SIZE,
   DESCRIPTION_EXTENTION,
-  ItemType,
   TMP_FOLDER_PATH,
   ZIP_FILE_MIME_TYPES,
 } from './constants';
@@ -41,9 +40,9 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     h5p: { taskManager: h5pTM },
   } = fastify;
 
-  const { serviceMethod, serviceOptions, pathPrefix } = options;
+  const { fileItemType, fileConfigurations, pathPrefix } = options;
 
-  const fTM = new FileTaskManager(serviceOptions, serviceMethod);
+  const fTM = new FileTaskManager(fileConfigurations, fileItemType);
 
   fastify.register(fastifyMultipart, {
     limits: {
@@ -87,7 +86,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       else {
         try {
           const item = await generateItemFromFilename({
-            fileServiceType: serviceMethod,
+            fileItemType: fileItemType,
             uploadFile,
             filename,
             folderPath,
@@ -234,7 +233,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         log,
         reply,
         fileTaskManagers: { h5p: h5pTM, file: fTM },
-        fileServiceType: serviceMethod,
+        fileItemType,
         getChildrenFromItem,
         downloadFile,
       });

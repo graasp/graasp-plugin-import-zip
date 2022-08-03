@@ -1,8 +1,6 @@
 import { v4 } from 'uuid';
 
-import { Item } from 'graasp';
-
-import { ItemType } from '../src/constants';
+import { Item, ItemType } from '@graasp/sdk';
 
 export const FIXTURE_LIGHT_COLOR_ZIP_PATH = './fixtures/lightColor.zip';
 export const FIXTURE_DOT_ZIP_PATH = './fixtures/07.03.2022.zip';
@@ -21,8 +19,8 @@ const BASE_ITEM = {
   creator: 'Louise',
   createdAt: '2022-02-12',
   updatedAt: '2022-02-12',
-  settings: null,
-  extra: null,
+  settings: {},
+  extra: {},
 };
 export const ITEM_FOLDER = {
   ...BASE_ITEM,
@@ -31,7 +29,7 @@ export const ITEM_FOLDER = {
 
 export const ITEM_LOCAL = {
   ...BASE_ITEM,
-  type: ItemType.LOCALFILE,
+  type: ItemType.LOCAL_FILE,
   name: 'file.txt',
   extra: {
     file: {
@@ -44,7 +42,7 @@ export const ITEM_LOCAL = {
 };
 export const ITEM_S3 = {
   ...BASE_ITEM,
-  type: ItemType.S3FILE,
+  type: ItemType.S3_FILE,
   name: 's3File.txt',
   extra: {
     s3File: {
@@ -122,13 +120,13 @@ export const NON_EXISTING_FILE: Item = {
   id: v4(),
   name: 'not_existing_item',
   path: 'path',
-  type: ItemType.LOCALFILE,
+  type: ItemType.LOCAL_FILE,
   createdAt: 'createdAt',
   creator: 'Louise',
   updatedAt: 'updatedAt',
   description: '',
   extra: {
-    [ItemType.LOCALFILE]: {
+    [ItemType.LOCAL_FILE]: {
       path: 'path',
       mimetype: 'mimetype',
     },

@@ -1,26 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { GraaspError, GraaspErrorDetails } from 'graasp';
+import { ErrorFactory } from '@graasp/sdk';
 
-export class GraaspImportZipError implements GraaspError {
-  name: string;
-  code: string;
-  message: string;
-  statusCode?: number;
-  data?: unknown;
-  origin: 'plugin' | string;
+import { PLUGIN_NAME } from '../constants';
 
-  constructor({ code, statusCode, message }: GraaspErrorDetails, data?: unknown) {
-    this.name = code;
-    this.code = code;
-    this.message = message;
-    this.statusCode = statusCode;
-    this.data = data;
-    this.origin = 'plugin';
-  }
-}
+export const GraaspItemZipError = ErrorFactory(PLUGIN_NAME);
 
-export class FileIsInvalidArchiveError extends GraaspImportZipError {
+export class FileIsInvalidArchiveError extends GraaspItemZipError {
   constructor(data?: unknown) {
     super(
       {
@@ -33,7 +19,7 @@ export class FileIsInvalidArchiveError extends GraaspImportZipError {
   }
 }
 
-export class InvalidFileItemError extends GraaspImportZipError {
+export class InvalidFileItemError extends GraaspItemZipError {
   constructor(data?: unknown) {
     super(
       {
