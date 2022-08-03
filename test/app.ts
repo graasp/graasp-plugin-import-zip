@@ -48,6 +48,11 @@ const build = async ({
       taskManager: publicItemTaskManager,
     },
   });
+  app.decorate('h5p', {
+    taskManager: {
+      createDownloadH5PFileTask: jest.fn(),
+    },
+  });
 
   await app.register(plugin, DEFAULT_OPTIONS);
 

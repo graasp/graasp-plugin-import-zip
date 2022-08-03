@@ -5,8 +5,7 @@ import { Item, ItemType } from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
 import { PublicItemTaskManager } from 'graasp-plugin-public';
 import { BasePublicItemTask } from 'graasp-plugin-public/dist/services/item/tasks/base-public-item-task';
-import { ItemTaskManager, TaskRunner } from 'graasp-test';
-import MockTask from 'graasp-test/src/tasks/task';
+import { ItemTaskManager, Task, TaskRunner } from 'graasp-test';
 
 import plugin from '../src/publicPlugin';
 import build, { DEFAULT_OPTIONS } from './app';
@@ -17,7 +16,7 @@ const taskManager = new ItemTaskManager();
 const runner = new TaskRunner();
 const publicItemTaskManager = {} as unknown as PublicItemTaskManager;
 
-const getFileTask = new MockTask(null);
+const getFileTask = new Task(null);
 
 describe('Export Zip', () => {
   beforeEach(() => {
@@ -34,7 +33,7 @@ describe('Export Zip', () => {
     });
 
     publicItemTaskManager.createGetPublicItemTask = () => {
-      return new MockTask(ITEM_FOLDER) as unknown as BasePublicItemTask<Item>;
+      return new Task(ITEM_FOLDER) as unknown as BasePublicItemTask<Item>;
     };
 
     mockCreateGetTaskSequence({
@@ -76,7 +75,7 @@ describe('Export Zip', () => {
     });
 
     publicItemTaskManager.createGetPublicItemTask = () => {
-      return new MockTask(NON_EXISTING_FILE) as unknown as BasePublicItemTask<Item>;
+      return new Task(NON_EXISTING_FILE) as unknown as BasePublicItemTask<Item>;
     };
     mockCreateGetChildrenTask({
       itemTaskManager: taskManager,
