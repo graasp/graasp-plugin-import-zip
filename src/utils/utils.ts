@@ -29,7 +29,7 @@ import type {
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
-import { InvalidFileItemError } from './errors';
+import { InvalidFileItemError, UnexpectedExportError } from './errors';
 
 const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
 const asyncDetectFile = util.promisify(magic.detectFile.bind(magic));
@@ -365,7 +365,7 @@ export const prepareArchiveFromItem = async ({
       downloadFile,
     });
   } catch (error) {
-    throw new Error(`Error during exporting zip: ${error}`);
+    throw new UnexpectedExportError(error);
   }
 
   // wait for zip to be completely created
