@@ -4,6 +4,7 @@ import { mkdir, readFile } from 'fs/promises';
 import mime from 'mime-types';
 import mmm from 'mmmagic';
 import path from 'path';
+import slugify from 'slugify';
 import util from 'util';
 
 import { FastifyLoggerInstance } from 'fastify';
@@ -375,7 +376,7 @@ export const prepareArchiveFromItem = async ({
     zipStream.on('close', () => {
       // set reply headers depending zip file and return file
       const buffer = fs.readFileSync(zipPath);
-      reply.raw.setHeader('Content-Disposition', `filename="${item.name}.zip"`);
+      reply.raw.setHeader('Content-Disposition', `filename="${slugify(item.name)}.zip"`);
       reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
       reply.type('application/zip');
       resolve(buffer);

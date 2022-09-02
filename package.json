@@ -44,6 +44,7 @@
     "mmmagic": "0.5.3",
     "path": "0.12.7",
     "qs": "6.10.3",
+    "slugify": "1.6.5",
     "stream-promise": "3.2.0"
   },
   "devDependencies": {

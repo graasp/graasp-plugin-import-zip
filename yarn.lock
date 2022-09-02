@@ -3919,6 +3919,7 @@ __metadata:
     prettier: 2.6.2
     qs: 6.10.3
     slonik: 28.1.0
+    slugify: 1.6.5
     stream-promise: 3.2.0
     ts-jest: 28.0.2
     ts-node: 10.7.0
@@ -6871,6 +6872,13 @@ __metadata:
     serialize-error: ^8.0.0
     through2: ^4.0.2
   checksum: 414e8d2822ffbcaa0b92069cd82147073f3a7586842e160c796ef90b32a4b1ef4c1efbac0d803b2ae4b4231c340fc8c49202ee3f49d8a465ac0180c704a40827
+  languageName: node
+  linkType: hard
+
+"slugify@npm:1.6.5":
+  version: 1.6.5
+  resolution: "slugify@npm:1.6.5"
+  checksum: a955a1b600201030f4c1daa9bb74a17d4402a0693fc40978bbd17e44e64fd72dad3bac4037422aa8aed55b5170edd57f3f4cd8f59ba331f5cf0f10f1a7795609
   languageName: node
   linkType: hard
 
