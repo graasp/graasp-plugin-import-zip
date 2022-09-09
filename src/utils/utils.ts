@@ -376,7 +376,10 @@ export const prepareArchiveFromItem = async ({
     zipStream.on('close', () => {
       // set reply headers depending zip file and return file
       const buffer = fs.readFileSync(zipPath);
-      reply.raw.setHeader('Content-Disposition', `filename="${slugify(item.name)}.zip"`);
+      reply.raw.setHeader(
+        'Content-Disposition',
+        `filename="${slugify(item.name, { remove: /["'`]/g })}.zip"`,
+      );
       reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
       reply.type('application/zip');
       resolve(buffer);
