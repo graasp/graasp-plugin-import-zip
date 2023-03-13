@@ -376,10 +376,19 @@ export const prepareArchiveFromItem = async ({
     zipStream.on('close', () => {
       // set reply headers depending zip file and return file
       const buffer = fs.readFileSync(zipPath);
-      reply.raw.setHeader(
-        'Content-Disposition',
-        `filename="${slugify(item.name, { remove: /["'`]/g })}.zip"`,
-      );
+
+      try {
+        reply.raw.setHeader(
+          'Content-Disposition',
+          `filename="${encodeURIComponent(item.name)}.zip"`,
+        );
+      } catch (e) {
+        // TODO: send sentry error with name so we can patch
+        // use default name for zip
+        log.error(e);
+        reply.raw.setHeader('Content-Disposition', 'filename="download.zip"');
+      }
+
       reply.raw.setHeader('Content-Length', Buffer.byteLength(buffer));
       reply.type('application/zip');
       resolve(buffer);
