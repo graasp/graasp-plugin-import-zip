@@ -19,6 +19,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
       graaspActor,
     },
     h5p: { taskManager: h5pTM },
+    etherpad: etherpadService,
   } = fastify;
 
   if (!graaspPublicPlugin) {
@@ -59,6 +60,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         fileItemType,
         getChildrenFromItem,
         downloadFile,
+        etherpadService,
       });
     },
     onResponse: async ({ params, log }) => {

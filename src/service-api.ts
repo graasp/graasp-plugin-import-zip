@@ -2,6 +2,7 @@ import extract from 'extract-zip';
 import fs, { ReadStream, createReadStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import path from 'path';
+import sanitizeHtml from 'sanitize-html';
 import { pipeline } from 'stream/promises';
 import { v4 } from 'uuid';
 
@@ -38,6 +39,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
     items: { taskManager: iTM },
     taskRunner: runner,
     h5p: { taskManager: h5pTM },
+    etherpad: etherpadService,
   } = fastify;
 
   const { fileItemType, fileConfigurations, pathPrefix } = options;
@@ -91,6 +93,9 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
             filename,
             folderPath,
             log,
+            etherpadService,
+            member,
+            parentId,
           });
           if (item) {
             items.push(item);
@@ -172,7 +177,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         content,
       }) => {
         await runner.runSingleSequence(
-          iTM.createUpdateTaskSequence(member, parentId, { description: content }),
+          iTM.createUpdateTaskSequence(member, parentId, { description: sanitizeHtml(content) }),
         );
       };
 
@@ -236,6 +241,7 @@ const plugin: FastifyPluginAsync<GraaspPluginZipOptions> = async (fastify, optio
         fileItemType,
         getChildrenFromItem,
         downloadFile,
+        etherpadService,
       });
     },
     onResponse: async ({ params, log }) => {
