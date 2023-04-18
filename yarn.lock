@@ -880,7 +880,7 @@ __metadata:
 
 "@graasp/sdk@github:graasp/graasp-sdk#142-etherpad-service":
   version: 0.10.0
-  resolution: "@graasp/sdk@https://github.com/graasp/graasp-sdk.git#commit=5e7d11025f9df855413e66331b2f8b31ce98a98e"
+  resolution: "@graasp/sdk@https://github.com/graasp/graasp-sdk.git#commit=326238a489ad8bcde99a21ddf1a94490961f4025"
   dependencies:
     "@fastify/secure-session": 5.3.0
     "@graasp/etherpad-api": 2.1.1
@@ -892,7 +892,7 @@ __metadata:
     qs: 6.11.1
     slonik: 28.1.1
     uuid: 9.0.0
-  checksum: a3399d33abe93f43bf2004ca9a68ff8b78d2c0a3efdf38378a6a055bb54f948ef3ff714584d7945d1e73eb3d4e783c9f35988a2e4b11c1e930d96ce13ecd12b7
+  checksum: bf46cc74eb9f69aad75afda4af1b0fe72a0e70c7389a6e8ac75cba55e614097e0cc38677a945c8b8ea6840c1fdf0c06e4c27dc217dbc69a98c7966e611997804
   languageName: node
   linkType: hard
 

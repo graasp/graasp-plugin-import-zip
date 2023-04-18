@@ -125,6 +125,7 @@ export const generateItemFromFilename = async (options: {
         filename.slice(0, -ETHERPAD_EXTENSION.length),
         member,
         parentId,
+        content,
       );
     } catch (error) {
       // don't fail entire import if etherpad fails
