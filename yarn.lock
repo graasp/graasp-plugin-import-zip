@@ -4107,11 +4107,11 @@ __metadata:
   linkType: hard
 
 "graasp-test@github:graasp/graasp-test":
-  version: 0.1.0
-  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=3ff1f7951d1c2439f84fab546bf8de60b530bd1c"
+  version: 1.0.2
+  resolution: "graasp-test@https://github.com/graasp/graasp-test.git#commit=a3709c123a9ed0076e05bbe1d21a765114ce80f2"
   dependencies:
-    uuid: 8.3.2
-  checksum: aaa3759fe2842de03fdc99011623dced835636fe5e15598c8574b9d526c040615dac3bf06fd351007a07d267493f9cd4e70c14ef35b0b73fb2810f90be4bbae8
+    uuid: 9.0.0
+  checksum: 1f26cad46051bf0b68bcdaefa71021411eb8bb34837201eadfaf16b706380e9be13c41603df30e11ebfef54c67eb52284eadca6af46e528529d953ba89f506f4
   languageName: node
   linkType: hard
 
