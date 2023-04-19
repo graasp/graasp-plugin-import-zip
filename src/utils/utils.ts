@@ -4,29 +4,40 @@ import { mkdir, readFile } from 'fs/promises';
 import mime from 'mime-types';
 import mmm from 'mmmagic';
 import path from 'path';
-import slugify from 'slugify';
+import sanitizeHtml from 'sanitize-html';
 import util from 'util';
 
 import { FastifyLoggerInstance } from 'fastify';
 
-import { Actor, Item, ItemType, LocalFileItemExtra, S3FileItemExtra, Task } from '@graasp/sdk';
+import {
+  Actor,
+  DiscriminatedItem,
+  EtherpadService,
+  H5PTaskManager,
+  Item,
+  ItemType,
+  LocalFileItemExtra,
+  Member,
+  S3FileItemExtra,
+  Task,
+} from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
 import { ORIGINAL_FILENAME_TRUNCATE_LIMIT } from 'graasp-plugin-file-item';
 
 import {
   APP_URL_PREFIX,
   DESCRIPTION_EXTENTION,
+  ETHERPAD_EXTENSION,
   GRAASP_DOCUMENT_EXTENSION,
   LINK_EXTENSION,
+  PLUGIN_NAME,
   TMP_FOLDER_PATH,
   URL_PREFIX,
   buildSettings,
 } from '../constants';
 import type {
   DownloadFileFunction,
-  Extra,
   GetChildrenFromItemFunction,
-  H5PTaskManager,
   UpdateParentDescriptionFunction,
   UploadFileFunction,
 } from '../types';
@@ -39,10 +50,14 @@ export const generateItemFromFilename = async (options: {
   filename: string;
   folderPath: string;
   log: FastifyLoggerInstance;
-  fileItemType: string;
+  fileItemType: 'file' | 's3File';
   uploadFile: UploadFileFunction;
+  etherpadService: EtherpadService;
+  member: Member;
+  parentId: string;
 }): Promise<Partial<Item> | null> => {
-  const { filename, uploadFile, fileItemType, folderPath } = options;
+  const { filename, uploadFile, fileItemType, folderPath, etherpadService, member, parentId, log } =
+    options;
 
   // ignore hidden files such as .DS_STORE
   if (filename.startsWith('.')) {
@@ -98,10 +113,24 @@ export const generateItemFromFilename = async (options: {
       extra: {
         [ItemType.DOCUMENT]: {
           // not sure
-          content: content,
+          content: sanitizeHtml(content),
         },
       },
     };
+  }
+  // etherpad
+  else if (filename.endsWith(ETHERPAD_EXTENSION)) {
+    try {
+      await etherpadService.createEtherpadItem(
+        filename.slice(0, -ETHERPAD_EXTENSION.length),
+        member,
+        parentId,
+        content,
+      );
+    } catch (error) {
+      // don't fail entire import if etherpad fails
+      log.error(`${PLUGIN_NAME}: failed to import etherpad ${filename}`);
+    }
   }
   // normal files
   else {
@@ -132,7 +161,7 @@ const setDescriptionInItem = ({ filename, content, items, extention }) => {
   const name = filename.slice(0, -extention.length);
   const item = items.find(({ name: thisName }) => name === thisName);
   if (item) {
-    item.description = content;
+    item.description = sanitizeHtml(content);
   } else {
     console.error(`Cannot find item with name ${name}`);
   }
@@ -194,7 +223,7 @@ export const buildTextContent = (url: string, type: ItemType): string => {
 };
 
 export const addItemToZip = async (args: {
-  item: Item;
+  item: DiscriminatedItem;
   archiveRootPath: string;
   archive: Archiver;
   fileTaskManagers: { file: FileTaskManager; h5p: H5PTaskManager };
@@ -202,6 +231,7 @@ export const addItemToZip = async (args: {
   fileStorage: string;
   getChildrenFromItem: GetChildrenFromItemFunction;
   downloadFile: DownloadFileFunction;
+  etherpadService: EtherpadService;
 }) => {
   const {
     item,
@@ -212,9 +242,8 @@ export const addItemToZip = async (args: {
     fileStorage,
     getChildrenFromItem,
     downloadFile,
+    etherpadService,
   } = args;
-  // get item and its related data
-  const itemExtra = item.extra as Extra;
   let subItems = null;
 
   switch (item.type) {
@@ -275,18 +304,26 @@ export const addItemToZip = async (args: {
 
       break;
     }
+    case ItemType.ETHERPAD: {
+      const padID = item.extra.etherpad.padID;
+      const { html } = await etherpadService.api.getHTML({ padID });
+      archive.append(html, {
+        name: path.join(archiveRootPath, `${item.name}${ETHERPAD_EXTENSION}`),
+      });
+      break;
+    }
     case ItemType.DOCUMENT:
-      archive.append(itemExtra.document?.content, {
+      archive.append(item.extra.document?.content, {
         name: path.join(archiveRootPath, `${item.name}${GRAASP_DOCUMENT_EXTENSION}`),
       });
       break;
     case ItemType.LINK:
-      archive.append(buildTextContent(itemExtra.embeddedLink?.url, ItemType.LINK), {
+      archive.append(buildTextContent(item.extra.embeddedLink?.url, ItemType.LINK), {
         name: path.join(archiveRootPath, `${item.name}${LINK_EXTENSION}`),
       });
       break;
     case ItemType.APP:
-      archive.append(buildTextContent(itemExtra.app?.url, ItemType.APP), {
+      archive.append(buildTextContent(item.extra.app?.url, ItemType.APP), {
         name: path.join(archiveRootPath, `${item.name}${LINK_EXTENSION}`),
       });
       break;
@@ -311,6 +348,7 @@ export const addItemToZip = async (args: {
             fileStorage,
             getChildrenFromItem,
             downloadFile,
+            etherpadService,
           }),
         ),
       );
@@ -329,6 +367,7 @@ export const prepareArchiveFromItem = async ({
   reply,
   getChildrenFromItem,
   downloadFile,
+  etherpadService,
 }) => {
   // init archive
   const archive = archiver.create('zip', { store: true });
@@ -364,6 +403,7 @@ export const prepareArchiveFromItem = async ({
       fileStorage,
       getChildrenFromItem,
       downloadFile,
+      etherpadService,
     });
   } catch (error) {
     throw new UnexpectedExportError(error);

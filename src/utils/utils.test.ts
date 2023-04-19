@@ -5,7 +5,7 @@ import path from 'path';
 
 import { FastifyLoggerInstance } from 'fastify';
 
-import { Item, ItemType } from '@graasp/sdk';
+import { EtherpadService, Item, ItemType, Member, MemberType } from '@graasp/sdk';
 import { FileTaskManager } from 'graasp-plugin-file';
 import { Task, TaskRunner } from 'graasp-test';
 
@@ -28,6 +28,29 @@ const DEFAULT_FILE_SERVICE_TYPE = 'file';
 const DEFAULT_PARENT_ID = 'parentId';
 const DEFAULT_LOGGER = {} as unknown as FastifyLoggerInstance;
 
+const MOCK_MEMBER: Member = {
+  name: 'mock-member',
+  email: 'mock-email',
+  type: MemberType.Individual,
+  extra: {},
+  createdAt: 'mock-created-at',
+  updatedAt: 'mock-updated-at',
+  id: 'mock-id',
+};
+
+const mockEtherpadService: EtherpadService = {
+  createEtherpadItem: jest.fn(),
+  getEtherpadFromItem: jest.fn(),
+  deleteEtherpadForItem: jest.fn(),
+  copyEtherpadInMutableItem: jest.fn(),
+  buildPadID: jest.fn(),
+  buildPadPath: jest.fn(),
+  buildEtherpadExtra: jest.fn(),
+  api: {
+    getHTML: jest.fn(),
+  } as unknown as EtherpadService['api'],
+};
+
 const buildMock = (taskManager: FileTaskManager, mockItem) =>
   jest.spyOn(taskManager, 'createDownloadFileTask').mockImplementation((member, { itemId }) => {
     if (mockItem.id === itemId)
@@ -47,6 +70,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       expect(item).toBeFalsy();
@@ -58,6 +84,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       expect(item).toEqual({ name: FOLDER_NAME, type: ItemType.FOLDER });
@@ -73,6 +102,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       const { size } = fs.lstatSync(path.resolve(__dirname, '../../test', FOLDER_PATH, 'img.png'));
@@ -103,6 +135,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: uploadFileMock,
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       const { size } = fs.lstatSync(
@@ -133,6 +168,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
       const filepath = path.resolve(__dirname, '../../test', FOLDER_PATH, documentFilename);
       const content = await readFile(filepath, {
@@ -159,6 +197,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       expect(item).toEqual({
@@ -180,6 +221,9 @@ describe('Utils', () => {
         log: DEFAULT_LOGGER,
         fileItemType: DEFAULT_FILE_SERVICE_TYPE,
         uploadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
+        member: MOCK_MEMBER,
+        parentId: 'mock-parent-id',
       });
 
       expect(item).toEqual({
@@ -337,6 +381,7 @@ describe('Utils', () => {
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
       });
     });
 
@@ -360,6 +405,7 @@ describe('Utils', () => {
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
       });
     });
 
@@ -383,6 +429,7 @@ describe('Utils', () => {
         fileStorage: '',
         getChildrenFromItem: jest.fn(),
         downloadFile: jest.fn(),
+        etherpadService: mockEtherpadService,
       });
     });
   });

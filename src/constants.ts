@@ -12,6 +12,7 @@ export const buildSettings = (hasThumbnail) => ({
 
 export const GRAASP_DOCUMENT_EXTENSION = '.graasp';
 export const LINK_EXTENSION = '.url';
+export const ETHERPAD_EXTENSION = '.etherpad.html';
 
 export const DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 250; // 250MB
 

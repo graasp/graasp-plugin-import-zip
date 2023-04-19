@@ -1,6 +1,13 @@
 import { v4 } from 'uuid';
 
-import { Item, ItemType } from '@graasp/sdk';
+import {
+  FolderItemType,
+  H5PItemType,
+  Item,
+  ItemType,
+  LocalFileItemType,
+  S3FileItemType,
+} from '@graasp/sdk';
 
 export const FIXTURE_LIGHT_COLOR_ZIP_PATH = './fixtures/lightColor.zip';
 export const FIXTURE_DOT_ZIP_PATH = './fixtures/07.03.2022.zip';
@@ -22,12 +29,15 @@ const BASE_ITEM = {
   settings: {},
   extra: {},
 };
-export const ITEM_FOLDER = {
+export const ITEM_FOLDER: FolderItemType = {
   ...BASE_ITEM,
   type: ItemType.FOLDER,
+  extra: {
+    [ItemType.FOLDER]: { childrenOrder: [] },
+  },
 };
 
-export const ITEM_LOCAL = {
+export const ITEM_LOCAL: LocalFileItemType = {
   ...BASE_ITEM,
   type: ItemType.LOCAL_FILE,
   name: 'file.txt',
@@ -36,11 +46,11 @@ export const ITEM_LOCAL = {
       name: 'file.txt',
       path: 'filePath',
       mimetype: 'text/plain',
-      size: 'fileSize',
+      size: 42,
     },
   },
 };
-export const ITEM_S3 = {
+export const ITEM_S3: S3FileItemType = {
   ...BASE_ITEM,
   type: ItemType.S3_FILE,
   name: 's3File.txt',
@@ -49,11 +59,11 @@ export const ITEM_S3 = {
       name: 's3File.txt',
       path: 's3FilePath',
       mimetype: 'text/plain',
-      size: 's3FileSize',
+      size: 42,
     },
   },
 };
-export const ITEM_H5P = {
+export const ITEM_H5P: H5PItemType = {
   ...BASE_ITEM,
   type: ItemType.H5P,
   name: 'h5pFile.h5p',
