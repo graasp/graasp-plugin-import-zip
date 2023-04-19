@@ -244,7 +244,6 @@ export const addItemToZip = async (args: {
     downloadFile,
     etherpadService,
   } = args;
-  // get item and its related data
   let subItems = null;
 
   switch (item.type) {

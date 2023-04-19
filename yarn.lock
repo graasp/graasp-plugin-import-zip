@@ -878,9 +878,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graasp/sdk@github:graasp/graasp-sdk#142-etherpad-service":
-  version: 0.10.0
-  resolution: "@graasp/sdk@https://github.com/graasp/graasp-sdk.git#commit=326238a489ad8bcde99a21ddf1a94490961f4025"
+"@graasp/sdk@npm:0.11.0":
+  version: 0.11.0
+  resolution: "@graasp/sdk@npm:0.11.0"
   dependencies:
     "@fastify/secure-session": 5.3.0
     "@graasp/etherpad-api": 2.1.1
@@ -892,7 +892,7 @@ __metadata:
     qs: 6.11.1
     slonik: 28.1.1
     uuid: 9.0.0
-  checksum: bf46cc74eb9f69aad75afda4af1b0fe72a0e70c7389a6e8ac75cba55e614097e0cc38677a945c8b8ea6840c1fdf0c06e4c27dc217dbc69a98c7966e611997804
+  checksum: 72b99bd60190e3d9385c13b9a61bc4f0dbfffdf925bbf994a47805e35ddf6c50de43f8d3539564d1a41298ce6d6792e2caa47ff21a77038ffe7800367786989b
   languageName: node
   linkType: hard
 
@@ -4053,7 +4053,7 @@ __metadata:
     "@commitlint/cli": 16.2.4
     "@commitlint/config-conventional": 16.2.4
     "@fastify/multipart": 6.0.0
-    "@graasp/sdk": "github:graasp/graasp-sdk#142-etherpad-service"
+    "@graasp/sdk": 0.11.0
     "@graasp/translations": "github:graasp/graasp-translations"
     "@trivago/prettier-plugin-sort-imports": 3.2.0
     "@types/archiver": 5.3.1
